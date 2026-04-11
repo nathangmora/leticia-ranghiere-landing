@@ -55,6 +55,8 @@
   <symbol id="icon-star" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></symbol>
 </svg>
 
+<a href="#hero" class="skip-link">Pular para o conteúdo</a>
+
 <!-- Scroll Progress Bar -->
 <div class="scroll-progress" id="scrollProgress"></div>
 
@@ -125,7 +127,7 @@
 <section class="sobre" id="sobre">
   <div class="container">
     <div class="sobre-grid">
-      <div class="sobre-img-wrapper reveal-scale">
+      <div class="sobre-img-wrapper reveal-left">
         <img src="PHOTO-2026-04-04-20-00-52.jpg" alt="Dra. Leticia Ranghiere atendendo paciente" class="sobre-img" loading="lazy" width="600" height="800">
       </div>
       <div class="sobre-content">
@@ -262,7 +264,7 @@
       <p class="reveal">Cada resultado é único, porque cada paciente é única. Veja o que a técnica certa, no momento certo, pode fazer.</p>
     </div>
     <div class="resultados-gallery">
-      <div class="resultado-card reveal-scale">
+      <div class="resultado-card reveal-left">
         <img src="737e9af6e92200d67f74d1e2b3bc7e7c.jpg" alt="Resultado de tratamento dental" loading="lazy" width="400" height="500">
         <div class="overlay">
           <p>Mais confiança a cada sorriso.</p>
@@ -275,11 +277,11 @@
         <div class="ba-after">
           <img src="904521b47c29e903be7b18410c1d9b31.jpg" alt="Depois do tratamento — sorriso transformado" loading="lazy" width="400" height="500">
         </div>
-        <div class="ba-handle" id="baHandle"></div>
+        <div class="ba-handle" id="baHandle" role="slider" aria-label="Comparar antes e depois" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0"></div>
         <span class="ba-label ba-label-before">Antes</span>
         <span class="ba-label ba-label-after">Depois</span>
       </div>
-      <div class="resultado-card reveal-scale" style="transition-delay:.3s">
+      <div class="resultado-card reveal-right" style="transition-delay:.3s">
         <img src="bc0ff64b9c00a8cd12ec6bd2a9f6ebdb.jpg" alt="Sorriso após tratamento estético" loading="lazy" width="400" height="500">
         <div class="overlay">
           <p>Quando a técnica encontra a sensibilidade.</p>
@@ -382,6 +384,13 @@
         <p class="depo-service">Harmonização Facial</p>
       </div>
     </div>
+    <div class="depo-dots reveal" id="depoDots">
+      <button class="depo-dot active" data-index="0" aria-label="Depoimento 1"></button>
+      <button class="depo-dot" data-index="1" aria-label="Depoimento 2"></button>
+      <button class="depo-dot" data-index="2" aria-label="Depoimento 3"></button>
+      <button class="depo-dot" data-index="3" aria-label="Depoimento 4"></button>
+      <button class="depo-dot" data-index="4" aria-label="Depoimento 5"></button>
+    </div>
     <div class="depo-cta reveal">
       <a href="https://wa.me/5516991420404?text=Olá%20Dra.%20Letícia!%20Gostaria%20de%20agendar%20uma%20avaliação.%20Vim%20pelo%20Instagram" class="sobre-cta">Quero agendar minha consulta →</a>
     </div>
@@ -475,74 +484,74 @@
     <div class="faq-container">
       <div class="faq-accordion" id="faqAccordion">
         <div class="faq-item open stagger-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
+          <button class="faq-question" aria-expanded="true" aria-controls="faq-answer-1" onclick="toggleFaq(this)">
             A harmonização facial dói?
             <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
-          <div class="faq-answer" style="max-height:200px">
+          <div class="faq-answer" id="faq-answer-1" style="max-height:200px">
             <div class="faq-answer-inner">O desconforto é mínimo. Utilizamos anestésicos tópicos e técnicas que priorizam o seu conforto durante todo o procedimento. A maioria das pacientes se surpreende com o quão tranquilo é o processo.</div>
           </div>
         </div>
         <div class="faq-item stagger-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-2" onclick="toggleFaq(this)">
             Os resultados ficam naturais?
             <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
-          <div class="faq-answer">
+          <div class="faq-answer" id="faq-answer-2">
             <div class="faq-answer-inner">Sim, e essa é a minha prioridade. Trabalho com a filosofia do "menos é mais" — o objetivo é realçar a sua beleza, não criar um rosto diferente. Suas amigas vão notar que você está mais bonita, mas não vão saber exatamente por quê.</div>
           </div>
         </div>
         <div class="faq-item stagger-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-3" onclick="toggleFaq(this)">
             Quanto tempo dura o efeito do botox?
             <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
-          <div class="faq-answer">
+          <div class="faq-answer" id="faq-answer-3">
             <div class="faq-answer-inner">Em média, de 4 a 6 meses, variando conforme o metabolismo de cada paciente. Com a manutenção regular, os resultados tendem a durar mais com o tempo.</div>
           </div>
         </div>
         <div class="faq-item stagger-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-4" onclick="toggleFaq(this)">
             As lentes de contato dental estragam os dentes?
             <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
-          <div class="faq-answer">
+          <div class="faq-answer" id="faq-answer-4">
             <div class="faq-answer-inner">Não. As lentes são minimamente invasivas e, em muitos casos, exigem pouco ou nenhum desgaste do dente natural. Na avaliação, explico detalhadamente como funciona o processo para o seu caso específico.</div>
           </div>
         </div>
         <div class="faq-item stagger-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-5" onclick="toggleFaq(this)">
             Preciso de repouso após os procedimentos?
             <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
-          <div class="faq-answer">
+          <div class="faq-answer" id="faq-answer-5">
             <div class="faq-answer-inner">A maioria dos procedimentos tem recuperação rápida. Alguns podem causar leve inchaço ou vermelhidão nas primeiras horas, mas geralmente você pode retomar suas atividades normais no mesmo dia. Passo todas as orientações detalhadas antes e depois.</div>
           </div>
         </div>
         <div class="faq-item stagger-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-6" onclick="toggleFaq(this)">
             Como funciona a primeira consulta?
             <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
-          <div class="faq-answer">
+          <div class="faq-answer" id="faq-answer-6">
             <div class="faq-answer-inner">A avaliação inicial é o momento mais importante. Ouço suas queixas, analiso seu rosto e sorriso como um todo e, juntas, montamos um plano personalizado. Sem pressão, sem pressa — você decide no seu tempo.</div>
           </div>
         </div>
         <div class="faq-item stagger-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-7" onclick="toggleFaq(this)">
             Posso combinar mais de um tratamento?
             <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
-          <div class="faq-answer">
+          <div class="faq-answer" id="faq-answer-7">
             <div class="faq-answer-inner">Sim, e muitas vezes essa é a melhor estratégia. Um plano integrado de estética dental e harmonização facial tende a trazer resultados mais harmoniosos e completos. Na avaliação, definimos juntas a melhor sequência.</div>
           </div>
         </div>
         <div class="faq-item stagger-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-8" onclick="toggleFaq(this)">
             A Dra. Leticia atende por plano de saúde?
             <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
-          <div class="faq-answer">
+          <div class="faq-answer" id="faq-answer-8">
             <div class="faq-answer-inner">Os tratamentos estéticos são realizados de forma particular. Na consulta de avaliação, apresento todas as opções e condições de pagamento para que você possa escolher com tranquilidade.</div>
           </div>
         </div>
@@ -599,10 +608,10 @@
         </div>
         <div class="loc-socials">
           <a href="https://instagram.com/draleticiarns" class="loc-social" aria-label="Instagram">
-            <img src="instagram.png" alt="Instagram da Dra. Leticia Ranghiere" loading="lazy">
+            <img src="instagram.png" alt="Instagram da Dra. Leticia Ranghiere" loading="lazy" width="32" height="32">
           </a>
           <a href="https://wa.me/5516991420404" class="loc-social" aria-label="WhatsApp">
-            <img src="whatsapp.png" alt="WhatsApp da Dra. Leticia Ranghiere" loading="lazy">
+            <img src="whatsapp.png" alt="WhatsApp da Dra. Leticia Ranghiere" loading="lazy" width="32" height="32">
           </a>
         </div>
       </div>
@@ -696,13 +705,13 @@
   <span class="fab-tooltip">Agendar pelo WhatsApp</span>
 </a>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" media="print" onload="this.media='all'"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 <script src="js/main.js"></script>
 
 <!-- Leaflet Map -->
 <script>
-(function(){
+function initLeafletMap(){
 var lat=-21.2117037,lng=-47.8114454;
 var map=L.map('leafletMap',{center:[lat,lng],zoom:17,zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,boxZoom:false,keyboard:false});
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
@@ -721,17 +730,19 @@ var hasFlown=false;
 function startFlyIn(){
 if(hasFlown)return;hasFlown=true;
 function lerp(c,n){var r=[];for(var i=0;i<c.length-1;i++){var a=c[i],b=c[i+1];for(var j=0;j<n;j++){var t=j/n;r.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t])}}r.push(c[c.length-1]);return r}
-var smooth=lerp(routeCoords,5),total=smooth.length,duration=3500,drawn=[],idx=0,t0=performance.now();
+var smooth=lerp(routeCoords,5),total=smooth.length,duration=2500,drawn=[],idx=0,t0=performance.now();
 var startEl=startMarker.getElement();if(startEl)startEl.classList.add('show');
 function draw(now){var p=Math.min((now-t0)/duration,1);var e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;var target=Math.floor(e*total);
 if(target>idx){for(var i=idx;i<=target&&i<total;i++)drawn.push(smooth[i]);idx=target;routeLine.setLatLngs(drawn);routeGlow.setLatLngs(drawn)}
 if(p<1){requestAnimationFrame(draw)}else{routeLine.setLatLngs(smooth);routeGlow.setLatLngs(smooth);
-setTimeout(function(){var el=marker.getElement();if(el){el.classList.add('show');var pinDiv=el.querySelector('.custom-pin');if(pinDiv){pinDiv.classList.remove('pin-animated');void pinDiv.offsetWidth;pinDiv.classList.add('pin-animated')}}},400);
-setTimeout(function(){marker.openPopup()},1200)}}
+var el=marker.getElement();if(el){el.classList.add('show');var pinDiv=el.querySelector('.custom-pin');if(pinDiv){pinDiv.classList.remove('pin-animated');void pinDiv.offsetWidth;pinDiv.classList.add('pin-animated')}}
+setTimeout(function(){marker.openPopup()},400)}}
 requestAnimationFrame(draw)}
-var mapObs=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){setTimeout(startFlyIn,300);mapObs.disconnect()}})},{threshold:.3});
-mapObs.observe(document.querySelector('.map-wrapper-lf'));
-})();
+var mapObs=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){startFlyIn();mapObs.disconnect()}})},{threshold:.08,rootMargin:'0px 0px 50px 0px'});
+mapObs.observe(document.getElementById('mapSec'));
+}
+if(typeof L!=='undefined'){initLeafletMap()}
+else{document.querySelector('script[src*="leaflet"]').addEventListener('load',initLeafletMap)}
 </script>
 </body>
 </html>
