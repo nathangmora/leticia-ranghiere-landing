@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Dra. Leticia Ranghiere</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#EDEBE8;color:#1a1a1a}
+:root{--bg:#EDEBE8;--sf:#F4F2EF;--nude:#C8A88E;--graf:#2C2C2A;--gray:#8a8880;--glt:#b5b3ad;--r:24px;
+--so:6px 6px 16px rgba(190,186,180,.45),-6px -6px 16px rgba(255,255,255,.8);
+--ss:3px 3px 8px rgba(190,186,180,.35),-3px -3px 8px rgba(255,255,255,.7);
+--si:inset 3px 3px 8px rgba(190,186,180,.35),inset -3px -3px 8px rgba(255,255,255,.7);
+--eb:cubic-bezier(0.34,1.56,0.64,1)}
+body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+.sb{position:fixed;top:0;left:0;height:2px;z-index:9998;background:var(--nude);opacity:.7;border-radius:0 2px 2px 0}
+[data-s]{opacity:0;transform:translateY(28px) scale(.96);transition:opacity .6s var(--eb),transform .6s var(--eb)}
+[data-s].v{opacity:1;transform:translateY(0) scale(1)}
+[data-s="1"]{transition-delay:50ms}[data-s="2"]{transition-delay:100ms}[data-s="3"]{transition-delay:150ms}
+[data-s="4"]{transition-delay:200ms}[data-s="5"]{transition-delay:250ms}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes shimmer{0%{left:-100%}40%,100%{left:100%}}
+@keyframes pulse{0%{transform:translate(-50%,-50%) scale(1);opacity:.6}100%{transform:translate(-50%,-50%) scale(3.5);opacity:0}}
+@keyframes pinRise{0%{opacity:0;transform:translate(-50%,-100%) scale(.5)}50%{opacity:1;transform:translate(-50%,-100%) scale(1.12)}72%{transform:translate(-50%,-100%) scale(.94)}100%{opacity:1;transform:translate(-50%,-100%) scale(1)}}
+@keyframes ctaPop{0%{opacity:0;transform:translate(-50%,8px) scale(.85)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes shadowBreathe{0%,100%{transform:translate(-50%,0) scaleX(1);opacity:.3}50%{transform:translate(-50%,0) scaleX(.65);opacity:.12}}
+.w{max-width:420px;margin:0 auto;padding:0 20px 48px}
+.hero{padding:52px 0 0;text-align:center}
+.avw{display:inline-block;margin-bottom:24px;animation:float 5s ease-in-out infinite;position:relative}
+.av{width:110px;height:110px;border-radius:50%;background:linear-gradient(145deg,#d4b69a,#C8A88E);display:flex;align-items:center;justify-content:center;box-shadow:var(--so),0 0 0 5px var(--bg)}
+.av span{font-family:'Instrument Serif',Georgia,serif;font-size:42px;color:#fff;font-style:italic;text-shadow:0 2px 8px rgba(0,0,0,.12)}
+.avr{position:absolute;inset:-8px;border-radius:50%;border:1.5px solid rgba(200,168,142,.2)}
+.hero h1{font-family:'Instrument Serif',Georgia,serif;font-size:38px;font-weight:400;color:var(--graf);letter-spacing:-1px;line-height:1.08}
+.hero .su{font-size:14px;color:var(--gray);margin:10px 0 4px;font-weight:300}
+.hero .su2{font-size:13px;color:var(--glt);font-weight:300;margin-bottom:16px}
+.pl{display:inline-flex;align-items:center;gap:8px;background:var(--bg);box-shadow:var(--si);border-radius:50px;padding:8px 20px}
+.pld{width:7px;height:7px;border-radius:50%;background:var(--nude);box-shadow:0 0 8px rgba(200,168,142,.6)}
+.pl span{font-size:11px;color:var(--nude);font-weight:500;letter-spacing:.4px}
+.sts{display:flex;margin:28px -20px 0;padding:22px 24px;background:var(--sf);box-shadow:var(--ss)}
+.st{flex:1;text-align:center}.st:not(:last-child){border-right:1px solid rgba(200,168,142,.1)}
+.st b{font-family:'Instrument Serif',Georgia,serif;font-size:26px;color:var(--graf);font-weight:400;display:block}
+.st small{font-size:9px;color:var(--glt);text-transform:uppercase;letter-spacing:1.2px;margin-top:2px;display:block}
+.wa{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#2BD96B,#25D366);border-radius:var(--r);padding:20px 22px;text-decoration:none;color:#fff;margin:24px 0 0;position:relative;overflow:hidden;box-shadow:4px 4px 14px rgba(37,211,102,.35),-2px -2px 8px rgba(255,255,255,.15);transition:transform .3s var(--eb)}
+.wa:active{transform:scale(.96)}
+.wa::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);animation:shimmer 5s ease-in-out infinite}
+.wai{width:48px;height:48px;border-radius:16px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wa h3{font-size:16px;font-weight:600}.wa p{font-size:12px;opacity:.75;margin-top:2px;font-weight:300}
+.sp{height:60px}
+.sec{font-size:10px;font-weight:600;color:var(--glt);letter-spacing:2.5px;text-transform:uppercase;margin:0 0 14px}
+.bn{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.bc{border-radius:var(--r);padding:22px 18px;text-decoration:none;color:var(--graf);display:flex;flex-direction:column;justify-content:space-between;min-height:150px;background:var(--sf);box-shadow:var(--so);position:relative;overflow:hidden;transition:transform .3s var(--eb),box-shadow .3s ease}
+.bc:active{transform:scale(.96);box-shadow:var(--si)}
+.bc.bw{grid-column:1/-1;flex-direction:row;align-items:center;gap:16px;min-height:auto;padding:20px 22px}
+.bi{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:var(--bg);box-shadow:var(--si)}
+.bt{font-size:16px;font-weight:600;letter-spacing:-.3px;line-height:1.2;margin-top:auto}
+.bd{font-size:12px;color:var(--gray);margin-top:4px;line-height:1.4;font-weight:300}
+.ba{position:absolute;right:16px;bottom:16px;font-size:13px;color:var(--glt);width:28px;height:28px;border-radius:50%;background:var(--bg);box-shadow:var(--ss);display:flex;align-items:center;justify-content:center}
+.bc.bw .ba{position:static;margin-left:auto}
+.tc{background:var(--sf);box-shadow:var(--so);border-radius:var(--r);padding:24px;margin-bottom:14px;transition:transform .3s var(--eb)}
+.tc:active{transform:scale(.98);box-shadow:var(--si)}
+.sr{display:flex;gap:3px;margin-bottom:12px}.ss{width:15px;height:15px;fill:var(--nude)}
+.tc q{font-size:14px;color:var(--graf);line-height:1.7;font-style:italic;font-weight:300;display:block}
+.tc cite{font-size:11px;color:var(--glt);margin-top:12px;font-style:normal;display:block}
+.lc{display:flex;align-items:center;gap:14px;border-radius:var(--r);padding:18px 20px;margin-bottom:14px;text-decoration:none;background:var(--sf);box-shadow:var(--so);transition:transform .3s var(--eb)}
+.lc:active{transform:scale(.97);box-shadow:var(--si)}
+.lc.dk{background:var(--graf);box-shadow:4px 4px 14px rgba(30,28,25,.4),-3px -3px 10px rgba(80,78,74,.15)}
+.li{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg);box-shadow:var(--si)}
+.lc.dk .li{background:rgba(200,168,142,.1);box-shadow:none}
+.lt{font-size:14px;font-weight:500}.ld{font-size:12px;color:var(--gray);margin-top:2px;font-weight:300}
+.la{font-size:15px;color:var(--glt);flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--bg);box-shadow:var(--ss);display:flex;align-items:center;justify-content:center}
+.lc.dk .la{background:rgba(200,168,142,.08);box-shadow:none}
+.cr{text-align:center;padding:32px 20px 8px}.cr p{font-size:11px;color:var(--glt);line-height:2.2;font-weight:300}
+.ft{text-align:center;padding:16px 0 32px;border-top:1px solid rgba(200,168,142,.08)}
+.ftl{font-family:'Instrument Serif',Georgia,serif;font-size:30px;color:var(--nude);font-style:italic;display:inline-block;animation:float 6s ease-in-out infinite}
+.ft p{font-size:10px;color:var(--glt);margin-top:6px;font-weight:300}
+::-webkit-scrollbar{width:0;background:transparent}
+/* ===== LEAFLET MAP ===== */
+.map-section-lf{width:100%;padding:40px 0 24px}
+.map-label-lf{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#C8A88E;opacity:.5;margin-bottom:16px;padding:0 20px}
+.map-wrapper-lf{position:relative;width:100%;border-radius:24px;overflow:hidden;margin:0}
+#leafletMap{width:100%;height:280px;z-index:1}
+.leaflet-control-attribution{display:none!important}
+.leaflet-control-zoom{display:none!important}
+.map-vignette-lf{position:absolute;inset:0;border-radius:24px;background:radial-gradient(ellipse 80% 70% at 55% 45%,transparent 40%,rgba(10,10,9,.75) 100%);pointer-events:none;z-index:2}
+.pin-cta{background:rgba(15,15,13,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(200,168,142,.15);border-radius:16px;padding:14px 18px;text-align:center;min-width:220px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.pin-cta .cta-title{font-size:14px;font-weight:600;color:#F5F0EB;margin-bottom:2px}
+.pin-cta .cta-sub{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:12px}
+.pin-cta .cta-btn{display:inline-block;background:#C8A88E;color:#fff;font-size:13px;font-weight:600;padding:10px 22px;border-radius:50px;text-decoration:none;transition:transform .15s,background .2s}
+.pin-cta .cta-btn:active{transform:scale(.96)}
+.custom-pin{position:relative;width:36px;height:46px}
+.custom-pin .pin-body{width:36px;height:36px;background:#C8A88E;border-radius:50% 50% 50% 0;transform:rotate(-45deg);position:absolute;top:0;left:0;box-shadow:0 4px 16px rgba(200,168,142,.5)}
+.custom-pin .pin-inner{width:14px;height:14px;background:#F5F0EB;border-radius:50%;position:absolute;top:11px;left:11px;z-index:1}
+.custom-pin .pin-shadow{width:20px;height:6px;background:rgba(0,0,0,.3);border-radius:50%;filter:blur(3px);position:absolute;bottom:0;left:8px}
+.start-point{width:14px;height:14px;position:relative}
+.start-point .dot{width:10px;height:10px;background:#888880;border-radius:50%;border:2px solid #555;position:absolute;top:2px;left:2px}
+.start-point::before{content:'';position:absolute;inset:-2px;border-radius:50%;border:1.5px solid #888880;animation:startPulse 2s ease-in-out infinite}
+@keyframes startPulse{0%,100%{transform:scale(1);opacity:.3}50%{transform:scale(1.6);opacity:0}}
+.custom-pin::before{content:'';position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;border:2px solid #C8A88E;animation:glowPulse 2.5s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{transform:scale(1);opacity:.4}50%{transform:scale(1.8);opacity:0}}
+#mapSec .leaflet-marker-icon{opacity:0;transition:opacity .3s ease}
+#mapSec .leaflet-marker-icon.show{opacity:1}
+@keyframes pinDrop{0%{transform:translateY(-40px);opacity:0}60%{transform:translateY(4px);opacity:1}80%{transform:translateY(-2px)}100%{transform:translateY(0);opacity:1}}
+.pin-animated{animation:pinDrop .7s cubic-bezier(.34,1.56,.64,1) forwards}
+.leaflet-popup-content-wrapper{background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:0!important}
+.leaflet-popup-content{margin:0!important;line-height:normal!important}
+.leaflet-popup-tip-container{display:none!important}
+.leaflet-popup-close-button{display:none!important}
+.map-address-lf{margin-top:16px;display:flex;align-items:center;gap:12px;padding:16px 18px;background:#2C2C2A;border-radius:16px;cursor:pointer;transition:background .2s;text-decoration:none;margin:16px 20px 0}
+.map-address-lf:hover{background:#353533}
+.map-address-icon-lf{width:42px;height:42px;border-radius:12px;background:rgba(200,168,142,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.map-address-icon-lf svg{width:20px;height:20px}
+.map-address-text-lf{flex:1;min-width:0}
+.map-address-title-lf{font-size:14px;font-weight:600;color:#F5F0EB;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-address-sub-lf{font-size:12px;color:#C8A88E;opacity:.6;margin-top:2px}
+.map-address-arrow-lf{font-size:16px;color:#C8A88E;opacity:.5;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="sb" id="sb"></div>
+<div class="w">
+<div class="hero">
+<div class="avw" data-s="0"><div class="avr"></div><div class="av"><span>LR</span></div></div>
+<h1 data-s="1">Dra. Leticia<br>Ranghiere</h1>
+<p class="su" data-s="2">Cirurgiã-Dentista · UNESP</p>
+<p class="su2" data-s="2">Estética dental + Harmonização Facial</p>
+<div data-s="3"><div class="pl"><div class="pld"></div><span>CRO/SP 133.036 · Ribeirão Preto</span></div></div>
+<div class="sts" data-s="4">
+<div class="st"><b>+1k</b><small>Pacientes</small></div>
+<div class="st"><b>UNESP</b><small>Formação</small></div>
+<div class="st"><b>5+</b><small>Anos exp.</small></div>
+</div>
+<a href="https://wa.me/5516991420404?text=Ol%C3%A1%20Dra.%20Let%C3%ADcia!%20Gostaria%20de%20agendar%20uma%20avalia%C3%A7%C3%A3o.%20Vim%20pelo%20Instagram" class="wa" data-s="5" target="_blank">
+<div class="wai"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.625-1.476A11.93 11.93 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.09 0-4.14-.564-5.93-1.632l-.425-.253-2.742.876.87-2.675-.277-.44A9.72 9.72 0 012.25 12 9.75 9.75 0 0112 2.25 9.75 9.75 0 0121.75 12 9.75 9.75 0 0112 21.75z"/></svg></div>
+<div style="flex:1"><h3>Agende sua avaliação</h3><p>Atendimento personalizado via WhatsApp</p></div>
+<span style="font-size:20px;opacity:.5">→</span></a>
+</div>
+<div class="sp"></div>
+<p class="sec" data-s="0">Procedimentos</p>
+<div class="bn">
+<a href="https://wa.me/5516991420404?text=Interesse%20em%20Botox" class="bc" data-s="1" target="_blank"><div class="bi">✨</div><div><div class="bt">Botox</div><div class="bd">Prevenção e suavização de rugas</div></div><span class="ba">↗</span></a>
+<a href="https://wa.me/5516991420404?text=Interesse%20em%20Preenchimento%20Labial" class="bc" data-s="2" target="_blank"><div class="bi">💋</div><div><div class="bt">Lábios</div><div class="bd">Preenchimento natural</div></div><span class="ba">↗</span></a>
+<a href="https://wa.me/5516991420404?text=Interesse%20em%20Microagulhamento" class="bc bw" data-s="3" target="_blank"><div class="bi">🔬</div><div style="flex:1"><div class="bt">Microagulhamento</div><div class="bd">Rejuvenescimento e textura da pele</div></div><span class="ba">→</span></a>
+<a href="https://wa.me/5516991420404?text=Interesse%20em%20Estética%20Dental" class="bc bw" data-s="4" target="_blank"><div class="bi">😁</div><div style="flex:1"><div class="bt">Estética Dental</div><div class="bd">Lentes, facetas e clareamento</div></div><span class="ba">→</span></a>
+</div>
+<div class="sp"></div>
+<p class="sec" data-s="0">Depoimentos</p>
+<div class="tc" data-s="1"><div class="sr"><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg></div><q>Me senti super segura desde a primeira consulta. Resultado natural e lindo.</q><cite>— Paciente de Harmonização Facial</cite></div>
+<div class="tc" data-s="2"><div class="sr"><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg></div><q>Fiz botox preventivo e amei. Profissional atenciosa e cuidadosa!</q><cite>— Paciente de Botox Preventivo</cite></div>
+</div>
+
+<!-- ========== MAP ========== -->
+<div style="margin:0 -20px;position:relative;overflow:hidden;background:#0a0a09" id="mapSec">
+<div class="map-section-lf">
+<div class="map-label-lf">Localiza&ccedil;&atilde;o</div>
+<div class="map-wrapper-lf">
+<div id="leafletMap"></div>
+<div class="map-vignette-lf"></div>
+</div>
+<a class="map-address-lf"
+   href="https://maps.google.com/maps?q=R.+Galileu+Galilei,+1685+-+Jardim+Iraj%C3%A1,+Ribeir%C3%A3o+Preto+-+SP"
+   target="_blank" rel="noopener noreferrer">
+<div class="map-address-icon-lf">
+<svg viewBox="0 0 24 24" fill="none" stroke="#C8A88E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+<circle cx="12" cy="10" r="3"/>
+</svg>
+</div>
+<div class="map-address-text-lf">
+<div class="map-address-title-lf">Ribeir&atilde;o Preto, SP</div>
+<div class="map-address-sub-lf">R. Galileu Galilei, 1685 &mdash; Jd. Iraj&aacute;</div>
+</div>
+<span class="map-address-arrow-lf">&rarr;</span>
+</a>
+</div>
+</div>
+
+<div class="sp"></div>
+<p class="sec" data-s="0">Saiba mais</p>
+<a href="https://draleticiarns.com.br" class="lc dk" data-s="1" target="_blank">
+<div class="li" style="background:rgba(200,168,142,.1);box-shadow:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A88E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+<div style="flex:1"><div class="lt" style="color:#F5F0EB">Conheça meu site</div><div class="ld" style="color:#888">Procedimentos e informações</div></div>
+<span class="la" style="color:#666;background:rgba(200,168,142,.08);box-shadow:none">→</span></a>
+<a href="https://instagram.com/draleticiarns" class="lc" data-s="2" target="_blank">
+<div class="li"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2C2C2A" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="#2C2C2A" stroke="none"/></svg></div>
+<div style="flex:1"><div class="lt">Siga no Instagram</div><div class="ld">Conteúdo sobre estética</div></div>
+<span class="la">→</span></a>
+<div class="cr" data-s="0"><p>Cirurgiã-Dentista · UNESP</p><p>Esp. Dentística Estética e Restauradora</p><p>Harmonização Orofacial · CRO/SP 133.036</p></div>
+<div class="ft" data-s="0"><div class="ftl">LR</div><p>Dra. Leticia Ranghiere · Odontologia</p><p style="margin-top:2px">© 2026</p></div>
+</div>
+<script>
+var O=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting)x.target.classList.add('v')})},{threshold:.08,rootMargin:'0px 0px -20px 0px'});
+document.querySelectorAll('[data-s]').forEach(function(el){O.observe(el)});
+
+/* ===== LEAFLET MAP ===== */
+(function(){
+var lat=-21.2117037,lng=-47.8114454;
+var map=L.map('leafletMap',{center:[lat,lng],zoom:17,zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,boxZoom:false,keyboard:false});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
+var routeCoords=[[-21.214487,-47.816036],[-21.214275,-47.815948],[-21.214217,-47.816091],[-21.214506,-47.816223],[-21.214568,-47.81607],[-21.214592,-47.816009],[-21.21462,-47.815941],[-21.214676,-47.815805],[-21.214733,-47.815667],[-21.214754,-47.815617],[-21.214799,-47.815516],[-21.214815,-47.815482],[-21.214986,-47.815102],[-21.215704,-47.815137],[-21.215781,-47.815137],[-21.21619,-47.815156],[-21.216284,-47.815177],[-21.21641,-47.815206],[-21.216589,-47.815247],[-21.216745,-47.81533],[-21.216897,-47.81547],[-21.217082,-47.815694],[-21.217342,-47.816048],[-21.217405,-47.816195],[-21.217416,-47.816314],[-21.217416,-47.816477],[-21.217269,-47.817356],[-21.217133,-47.817779],[-21.217093,-47.818005],[-21.217107,-47.818075],[-21.217126,-47.818109],[-21.217156,-47.818135],[-21.217228,-47.81815],[-21.217264,-47.818139],[-21.217418,-47.81771],[-21.217554,-47.817385],[-21.217919,-47.816292],[-21.217974,-47.816195],[-21.21806,-47.816123],[-21.218134,-47.816067],[-21.21829,-47.816082],[-21.218554,-47.816071],[-21.218649,-47.816061],[-21.218784,-47.816024],[-21.218855,-47.815997],[-21.218924,-47.815891],[-21.218967,-47.815771],[-21.218981,-47.815643],[-21.218966,-47.815516],[-21.218924,-47.815387],[-21.218508,-47.815191],[-21.218399,-47.815141],[-21.218281,-47.815094],[-21.218188,-47.815066],[-21.218003,-47.815019],[-21.217935,-47.815004],[-21.217505,-47.814959],[-21.217241,-47.814912],[-21.216963,-47.814884],[-21.216646,-47.814852],[-21.216439,-47.814843],[-21.2158,-47.814848],[-21.215188,-47.814848],[-21.214666,-47.814827],[-21.214463,-47.814797],[-21.214215,-47.814753],[-21.214011,-47.814698],[-21.213819,-47.81463],[-21.212156,-47.813855],[-21.211348,-47.81348],[-21.211112,-47.813369],[-21.210905,-47.813267],[-21.211164,-47.812593],[-21.211452,-47.811909],[-21.211663,-47.811383],[-21.2117037,-47.8114454]];
+var routeGlow=L.polyline([],{color:'#C8A88E',weight:8,opacity:.15,lineCap:'round',lineJoin:'round'}).addTo(map);
+var routeLine=L.polyline([],{color:'#C8A88E',weight:3,opacity:.9,lineCap:'round',lineJoin:'round'}).addTo(map);
+var startIcon=L.divIcon({className:'',html:'<div class="start-point"><div class="dot"></div></div>',iconSize:[14,14],iconAnchor:[7,7]});
+var startMarker=L.marker(routeCoords[0],{icon:startIcon,interactive:false}).addTo(map);
+var pinIcon=L.divIcon({className:'',html:'<div class="custom-pin pin-animated"><div class="pin-body"></div><div class="pin-inner"></div><div class="pin-shadow"></div></div>',iconSize:[36,46],iconAnchor:[18,46],popupAnchor:[0,-50]});
+var marker=L.marker([lat,lng],{icon:pinIcon}).addTo(map);
+var popupContent='<div class="pin-cta"><div class="cta-title">R. Galileu Galilei, 1685</div><div class="cta-sub">Jardim Iraj\u00e1 \u00b7 Ribeir\u00e3o Preto, SP</div><a class="cta-btn" href="https://wa.me/5516991420404?text=Ol%C3%A1!%20Vi%20a%20localiza%C3%A7%C3%A3o.%20Gostaria%20de%20agendar" target="_blank" rel="noopener">Agendar avalia\u00e7\u00e3o \u2192</a></div>';
+var popup=L.popup({closeButton:false,closeOnClick:false,autoClose:false,className:'custom-popup',offset:[0,-4]}).setContent(popupContent);
+marker.bindPopup(popup);
+setTimeout(function(){map.invalidateSize()},100);
+var hasFlown=false;
+function startFlyIn(){
+if(hasFlown)return;hasFlown=true;
+function lerp(c,n){var r=[];for(var i=0;i<c.length-1;i++){var a=c[i],b=c[i+1];for(var j=0;j<n;j++){var t=j/n;r.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t])}}r.push(c[c.length-1]);return r}
+var smooth=lerp(routeCoords,5),total=smooth.length,duration=3500,drawn=[],idx=0,t0=performance.now();
+var startEl=startMarker.getElement();if(startEl)startEl.classList.add('show');
+function draw(now){var p=Math.min((now-t0)/duration,1);var e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;var target=Math.floor(e*total);
+if(target>idx){for(var i=idx;i<=target&&i<total;i++)drawn.push(smooth[i]);idx=target;routeLine.setLatLngs(drawn);routeGlow.setLatLngs(drawn)}
+if(p<1){requestAnimationFrame(draw)}else{routeLine.setLatLngs(smooth);routeGlow.setLatLngs(smooth);
+setTimeout(function(){var el=marker.getElement();if(el){el.classList.add('show');var pinDiv=el.querySelector('.custom-pin');if(pinDiv){pinDiv.classList.remove('pin-animated');void pinDiv.offsetWidth;pinDiv.classList.add('pin-animated')}}},400);
+setTimeout(function(){marker.openPopup()},1200)}}
+requestAnimationFrame(draw)}
+var mapObs=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){setTimeout(startFlyIn,300);mapObs.disconnect()}})},{threshold:.3});
+mapObs.observe(document.querySelector('.map-wrapper-lf'));
+})();
+
+window.addEventListener('scroll',function(){var h=document.documentElement.scrollHeight-innerHeight;document.getElementById('sb').style.width=(scrollY/h*100)+'%'},{passive:true});
+</script>
+</body>
+</html>

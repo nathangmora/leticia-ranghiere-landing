@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa - Dra. Leticia Ranghiere</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:#1a1a18;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+
+  .map-section{
+    width:100%;
+    max-width:390px;
+    padding:0 20px;
+  }
+
+  .map-label{
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:#C8A88E;
+    opacity:0.5;
+    margin-bottom:16px;
+  }
+
+  .map-container{
+    position:relative;
+    width:100%;
+    border-radius:24px;
+    overflow:hidden;
+    cursor:pointer;
+    transform:translateZ(0);
+    will-change:transform;
+    transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .map-container:hover{
+    transform:scale(1.01) translateZ(0);
+  }
+
+  .map-svg{
+    display:block;
+    width:100%;
+    height:auto;
+  }
+
+  /* Vignette overlay */
+  .map-vignette{
+    position:absolute;
+    inset:0;
+    border-radius:24px;
+    background:radial-gradient(ellipse 70% 60% at 55% 45%, transparent 30%, rgba(26,26,24,0.85) 100%);
+    pointer-events:none;
+  }
+
+  /* Glow ring pulse — CSS puro */
+  @keyframes pulse-ring{
+    0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.25}
+    50%{transform:translate(-50%,-50%) scale(1.4);opacity:0}
+  }
+  .pin-glow-ring{
+    animation:pulse-ring 2.4s ease-in-out infinite;
+    transform-origin:center center;
+  }
+
+  /* Street base — always visible once faded in */
+  .street-base{opacity:0;transition:opacity 0.5s ease}
+  .street-base.visible{opacity:1}
+
+  /* Intersection points */
+  .intersection{opacity:0;transition:opacity 0.6s ease}
+  .intersection.visible{opacity:1}
+
+  /* Pin entrance */
+  @keyframes pin-enter{
+    0%{transform:translate(-50%,-50%) scale(0) translateY(-20px);opacity:0}
+    60%{transform:translate(-50%,-50%) scale(1.15) translateY(0);opacity:1}
+    80%{transform:translate(-50%,-50%) scale(0.95);opacity:1}
+    100%{transform:translate(-50%,-50%) scale(1);opacity:1}
+  }
+  .pin-group{
+    opacity:0;
+    transform:translate(-50%,-50%) scale(0);
+  }
+  .pin-group.animate{
+    animation:pin-enter 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+
+  /* Labels */
+  .map-text-label{opacity:0;transition:opacity 0.8s ease}
+  .map-text-label.visible{opacity:1}
+
+  /* Address card below map */
+  .map-address{
+    margin-top:16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:16px 18px;
+    background:#2C2C2A;
+    border-radius:16px;
+    cursor:pointer;
+    transition:background 0.2s;
+    text-decoration:none;
+  }
+  .map-address:hover{background:#353533}
+
+  .map-address-icon{
+    width:42px;height:42px;
+    border-radius:12px;
+    background:rgba(200,168,142,0.12);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .map-address-icon svg{width:20px;height:20px}
+
+  .map-address-text{flex:1;min-width:0}
+  .map-address-title{
+    font-size:14px;font-weight:600;color:#F5F0EB;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .map-address-sub{
+    font-size:12px;color:#C8A88E;opacity:0.6;margin-top:2px;
+  }
+  .map-address-arrow{
+    font-size:16px;color:#C8A88E;opacity:0.5;flex-shrink:0;
+  }
+</style>
+</head>
+<body>
+
+<section class="map-section">
+  <div class="map-label">Localiza&ccedil;&atilde;o</div>
+
+  <div class="map-container" id="mapContainer" role="button" tabindex="0"
+       aria-label="Abrir localiza&ccedil;&atilde;o no Google Maps">
+
+    <svg class="map-svg" viewBox="0 0 390 280" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="bgGrad" cx="55%" cy="45%" r="60%">
+          <stop offset="0%" stop-color="#353532"/>
+          <stop offset="100%" stop-color="#2C2C2A"/>
+        </radialGradient>
+        <filter id="routeGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="pinGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- Background -->
+      <rect width="390" height="280" fill="url(#bgGrad)" rx="0"/>
+
+      <!-- === RUAS REAIS — Jardim Iraja, Ribeirao Preto (OpenStreetMap) === -->
+
+      <!-- RUAS BASE (cinza, sempre visiveis) -->
+      <!-- Av. Presidente Vargas (principal, diagonal NO-SE) -->
+      <path class="street-base" d="M 147 78 L 131 143 L 108 213 L 87 273" stroke="#4A4A46" stroke-width="2.5" opacity="0.28" fill="none" style="transition-delay:0ms"/>
+      <!-- R. Galileu Galilei (diagonal, onde fica o consultorio) -->
+      <path class="street-base" d="M 138 112 L 173 123 L 204 135" stroke="#4A4A46" stroke-width="2" opacity="0.30" fill="none" style="transition-delay:80ms"/>
+      <!-- Av. Bianco Molina (diagonal longa NE) -->
+      <path class="street-base" d="M 164 80 L 244 101 L 375 131" stroke="#4A4A46" stroke-width="2" opacity="0.22" fill="none" style="transition-delay:160ms"/>
+      <!-- R. Hudson (diagonal SO) -->
+      <path class="street-base" d="M 86 280 L 108 227 L 127 140" stroke="#4A4A46" stroke-width="1.2" opacity="0.18" fill="none" style="transition-delay:240ms"/>
+      <!-- R. Miguel Delloiagono (diagonal SE-NO) -->
+      <path class="street-base" d="M 279 233 L 228 193 L 178 157" stroke="#4A4A46" stroke-width="1.2" opacity="0.18" fill="none" style="transition-delay:100ms"/>
+      <!-- R. Joao Alves Silva Jr (curta, quase vertical) -->
+      <path class="street-base" d="M 198 99 L 189 115 L 182 128" stroke="#4A4A46" stroke-width="1" opacity="0.16" fill="none" style="transition-delay:180ms"/>
+      <!-- R. Joaquim A. Nascimento (diagonal) -->
+      <path class="street-base" d="M 179 85 L 163 115 L 146 147" stroke="#4A4A46" stroke-width="1.2" opacity="0.18" fill="none" style="transition-delay:260ms"/>
+      <!-- R. Jose da Costa Mello (quase horizontal) -->
+      <path class="street-base" d="M 252 161 L 179 163 L 113 164" stroke="#4A4A46" stroke-width="1.2" opacity="0.20" fill="none" style="transition-delay:340ms"/>
+      <!-- R. Salvador Delloiagono (diagonal curta) -->
+      <path class="street-base" d="M 127 140 L 153 149 L 178 157" stroke="#4A4A46" stroke-width="1" opacity="0.15" fill="none" style="transition-delay:300ms"/>
+      <!-- R. Toronto (diagonal leste) -->
+      <path class="street-base" d="M 369 157 L 326 165 L 277 177" stroke="#4A4A46" stroke-width="1" opacity="0.14" fill="none" style="transition-delay:380ms"/>
+      <!-- R. Vancouver (curta, quase vertical) -->
+      <path class="street-base" d="M 331 176 L 326 160 L 319 148" stroke="#4A4A46" stroke-width="0.8" opacity="0.12" fill="none" style="transition-delay:420ms"/>
+      <!-- R. Bernardo Alves Pereira (bem curta) -->
+      <line class="street-base" x1="199" y1="144" x2="208" y2="153" stroke="#4A4A46" stroke-width="0.8" opacity="0.12" style="transition-delay:200ms"/>
+      <!-- R. Couto Magalhaes (norte) -->
+      <path class="street-base" d="M 190 7 L 170 31 L 147 52" stroke="#4A4A46" stroke-width="1" opacity="0.14" fill="none" style="transition-delay:350ms"/>
+      <!-- R. Adolfo Serra (diagonal norte) -->
+      <path class="street-base" d="M 213 0 L 241 31 L 266 70" stroke="#4A4A46" stroke-width="1" opacity="0.12" fill="none" style="transition-delay:400ms"/>
+      <!-- Av. Mariano Pedroso (curta, norte) -->
+      <line class="street-base" x1="160" y1="50" x2="129" y2="41" stroke="#4A4A46" stroke-width="1" opacity="0.12" style="transition-delay:280ms"/>
+
+      <!-- RUAS ANIMADAS (draw loop, nude por cima) -->
+      <!-- Av. Presidente Vargas -->
+      <path class="street-draw" data-dur="4000" data-delay="0" data-pause="2000"
+            d="M 147 78 L 131 143 L 108 213 L 87 273" stroke="#C8A88E" stroke-width="2.5" opacity="0.40" fill="none" stroke-linecap="round"/>
+      <!-- R. Galileu Galilei -->
+      <path class="street-draw" data-dur="3000" data-delay="500" data-pause="1500"
+            d="M 138 112 L 173 123 L 204 135" stroke="#C8A88E" stroke-width="2" opacity="0.45" fill="none" stroke-linecap="round"/>
+      <!-- Av. Bianco Molina -->
+      <path class="street-draw" data-dur="4500" data-delay="1200" data-pause="2200"
+            d="M 164 80 L 244 101 L 375 131" stroke="#C8A88E" stroke-width="2" opacity="0.35" fill="none" stroke-linecap="round"/>
+      <!-- R. Hudson -->
+      <path class="street-draw" data-dur="3800" data-delay="800" data-pause="1800"
+            d="M 86 280 L 108 227 L 127 140" stroke="#C8A88E" stroke-width="1.2" opacity="0.28" fill="none" stroke-linecap="round"/>
+      <!-- R. Miguel Delloiagono -->
+      <path class="street-draw" data-dur="3600" data-delay="2000" data-pause="1600"
+            d="M 279 233 L 228 193 L 178 157" stroke="#C8A88E" stroke-width="1.2" opacity="0.28" fill="none" stroke-linecap="round"/>
+      <!-- R. Joao Alves Silva Jr -->
+      <path class="street-draw" data-dur="2800" data-delay="1500" data-pause="2500"
+            d="M 198 99 L 189 115 L 182 128" stroke="#C8A88E" stroke-width="1" opacity="0.22" fill="none" stroke-linecap="round"/>
+      <!-- R. Joaquim A. Nascimento -->
+      <path class="street-draw" data-dur="3200" data-delay="600" data-pause="2000"
+            d="M 179 85 L 163 115 L 146 147" stroke="#C8A88E" stroke-width="1.2" opacity="0.28" fill="none" stroke-linecap="round"/>
+      <!-- R. Jose da Costa Mello -->
+      <path class="street-draw" data-dur="3500" data-delay="1800" data-pause="1400"
+            d="M 252 161 L 179 163 L 113 164" stroke="#C8A88E" stroke-width="1.2" opacity="0.30" fill="none" stroke-linecap="round"/>
+      <!-- R. Salvador Delloiagono -->
+      <path class="street-draw" data-dur="2600" data-delay="2500" data-pause="2800"
+            d="M 127 140 L 153 149 L 178 157" stroke="#C8A88E" stroke-width="1" opacity="0.22" fill="none" stroke-linecap="round"/>
+      <!-- R. Toronto -->
+      <path class="street-draw" data-dur="3400" data-delay="1000" data-pause="2400"
+            d="M 369 157 L 326 165 L 277 177" stroke="#C8A88E" stroke-width="1" opacity="0.20" fill="none" stroke-linecap="round"/>
+      <!-- R. Couto Magalhaes -->
+      <path class="street-draw" data-dur="3000" data-delay="3000" data-pause="2000"
+            d="M 190 7 L 170 31 L 147 52" stroke="#C8A88E" stroke-width="1" opacity="0.20" fill="none" stroke-linecap="round"/>
+      <!-- R. Adolfo Serra -->
+      <path class="street-draw" data-dur="3200" data-delay="2200" data-pause="1800"
+            d="M 213 0 L 241 31 L 266 70" stroke="#C8A88E" stroke-width="1" opacity="0.18" fill="none" stroke-linecap="round"/>
+
+      <!-- === QUADRAS (blocos baseados nas ruas reais) === -->
+      <!-- Quadra entre Galileu Galilei / Joaquim / Vargas / Joao Alves -->
+      <polygon class="street-base" points="147,78 164,80 182,128 146,147 131,143" fill="#333330" opacity="0.10" style="transition-delay:150ms"/>
+      <!-- Quadra entre Galileu / J. Alves / Bianco Molina -->
+      <polygon class="street-base" points="164,80 198,99 182,128 173,123" fill="#333330" opacity="0.08" style="transition-delay:250ms"/>
+      <!-- Quadra entre Galileu / Costa Mello / Salvador / Miguel -->
+      <polygon class="street-base" points="178,157 204,135 252,161 179,163" fill="#333330" opacity="0.08" style="transition-delay:350ms"/>
+      <!-- Quadra entre Vargas / Joaquim / Salvador / Hudson -->
+      <polygon class="street-base" points="131,143 146,147 153,149 127,140" fill="#333330" opacity="0.06" style="transition-delay:300ms"/>
+
+      <!-- === INTERSECCOES (cruzamentos reais) === -->
+      <!-- Galileu x Joao Alves -->
+      <circle class="intersection" cx="182" cy="128" r="2.5" fill="#C8A88E" opacity="0.50" style="transition-delay:500ms"/>
+      <!-- Vargas x Joaquim -->
+      <circle class="intersection" cx="131" cy="143" r="3" fill="#C8A88E" opacity="0.55" style="transition-delay:550ms"/>
+      <!-- Vargas x Bianco Molina -->
+      <circle class="intersection" cx="147" cy="78" r="2.5" fill="#C8A88E" opacity="0.40" style="transition-delay:600ms"/>
+      <!-- Hudson x Salvador -->
+      <circle class="intersection" cx="127" cy="140" r="2" fill="#C8A88E" opacity="0.35" style="transition-delay:650ms"/>
+      <!-- Miguel x Costa Mello -->
+      <circle class="intersection" cx="178" cy="157" r="2.5" fill="#C8A88E" opacity="0.40" style="transition-delay:700ms"/>
+      <!-- Bianco Molina x Joao Alves -->
+      <circle class="intersection" cx="198" cy="99" r="2" fill="#C8A88E" opacity="0.30" style="transition-delay:750ms"/>
+      <!-- Costa Mello x Toronto area -->
+      <circle class="intersection" cx="252" cy="161" r="2" fill="#C8A88E" opacity="0.25" style="transition-delay:800ms"/>
+
+      <!-- Breathing na interseccao principal (Galileu x Joao Alves) -->
+      <circle cx="182" cy="128" r="5" fill="none" stroke="#C8A88E" stroke-width="1" opacity="0">
+        <animate attributeName="opacity" values="0;0.3;0" dur="3s" repeatCount="indefinite" begin="1.5s"/>
+        <animate attributeName="r" values="5;9;5" dur="3s" repeatCount="indefinite" begin="1.5s"/>
+      </circle>
+      <!-- Breathing Vargas x Joaquim -->
+      <circle cx="131" cy="143" r="5" fill="none" stroke="#C8A88E" stroke-width="1" opacity="0">
+        <animate attributeName="opacity" values="0;0.2;0" dur="3.5s" repeatCount="indefinite" begin="2s"/>
+        <animate attributeName="r" values="5;8;5" dur="3.5s" repeatCount="indefinite" begin="2s"/>
+      </circle>
+
+      <!-- === ROTA PRINCIPAL (Av. Vargas -> Galileu Galilei -> Pin) === -->
+      <!-- Glow por baixo -->
+      <path id="routeGlowBg"
+            d="M 87 273 L 108 213 L 131 143 L 138 112 L 173 123 L 195 140"
+            stroke="#C8A88E" stroke-width="10" fill="none"
+            stroke-linecap="round" stroke-linejoin="round" opacity="0"
+            filter="url(#routeGlow)"/>
+      <!-- Rota visivel -->
+      <path id="routePath"
+            d="M 87 273 L 108 213 L 131 143 L 138 112 L 173 123 L 195 140"
+            stroke="#C8A88E" stroke-width="3.5" fill="none"
+            stroke-linecap="round" stroke-linejoin="round"
+            filter="url(#routeGlow)"
+            opacity="0.90"/>
+
+      <!-- === PONTO DE ORIGEM (Av. Presidente Vargas, sul) === -->
+      <circle cx="87" cy="273" r="5" fill="#888880" opacity="0.7"/>
+      <circle cx="87" cy="273" r="8" fill="none" stroke="#888880" stroke-width="1" opacity="0.2"/>
+
+      <!-- === PIN DE DESTINO (R. Galileu Galilei, 1685) === -->
+      <g class="pin-group" id="pinGroup" style="transform-origin:195px 140px">
+        <circle class="pin-glow-ring" cx="195" cy="140" r="18"
+                fill="none" stroke="#C8A88E" stroke-width="2" opacity="0.25"
+                style="transform-origin:195px 140px"/>
+        <circle cx="195" cy="140" r="14" fill="#C8A88E" opacity="0.15" filter="url(#pinGlow)"/>
+        <circle cx="195" cy="140" r="13" fill="#C8A88E"/>
+        <circle cx="195" cy="140" r="6" fill="#F5F0EB"/>
+      </g>
+
+      <!-- === LABELS === -->
+      <!-- R. Galileu Galilei (ao longo da rua real) -->
+      <text class="map-text-label" x="148" y="118" fill="#C8A88E" opacity="0.40"
+            font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"
+            font-size="6.5" font-weight="500"
+            transform="rotate(10 148 118)"
+            style="transition-delay:3200ms">
+        R. Galileu Galilei
+      </text>
+
+      <!-- Av. Presidente Vargas (ao longo da avenida) -->
+      <text class="map-text-label" x="95" y="185" fill="#888880" opacity="0.25"
+            font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"
+            font-size="5.5" font-weight="500"
+            transform="rotate(73 95 185)"
+            style="transition-delay:3400ms">
+        Av. Pres. Vargas
+      </text>
+
+      <!-- Bairro -->
+      <text class="map-text-label" x="230" y="120" fill="#888880" opacity="0.30"
+            font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"
+            font-size="7" font-weight="600" letter-spacing="1.5"
+            style="transition-delay:3400ms">
+        JD. IRAJ&Aacute;
+      </text>
+
+      <text class="map-text-label" x="130" y="230" fill="#C8A88E" opacity="0"
+            font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"
+            font-size="6.5" font-weight="400"
+            id="distanceLabel"
+            style="transition-delay:3600ms">
+        1,2 km
+      </text>
+    </svg>
+
+    <div class="map-vignette"></div>
+  </div>
+
+  <a class="map-address" href="https://maps.google.com/maps?q=R.+Galileu+Galilei,+1685+-+Jardim+Iraj%C3%A1,+Ribeir%C3%A3o+Preto+-+SP"
+     target="_blank" rel="noopener noreferrer">
+    <div class="map-address-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#C8A88E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+    </div>
+    <div class="map-address-text">
+      <div class="map-address-title">Ribeir&atilde;o Preto, SP</div>
+      <div class="map-address-sub">R. Galileu Galilei, 1685 &mdash; Jd. Iraj&aacute;</div>
+    </div>
+    <span class="map-address-arrow">&rarr;</span>
+  </a>
+</section>
+
+<script>
+(function(){
+  var container = document.getElementById('mapContainer');
+  var routePath = document.getElementById('routePath');
+  var routeGlow = document.getElementById('routeGlowBg');
+  var pinGroup = document.getElementById('pinGroup');
+  var distLabel = document.getElementById('distanceLabel');
+  var animated = false;
+
+  // === DRAW LOOP ENGINE ===
+  // Animates a single SVG element: draw in -> pause -> fade out -> pause -> repeat
+  function createDrawLoop(el, duration, pauseAfter, pauseBefore){
+    var len = el.getTotalLength ? el.getTotalLength() :
+      Math.sqrt(Math.pow(parseFloat(el.getAttribute('x2')||0)-parseFloat(el.getAttribute('x1')||0),2) +
+                Math.pow(parseFloat(el.getAttribute('y2')||0)-parseFloat(el.getAttribute('y1')||0),2));
+
+    el.style.strokeDasharray = len;
+    el.style.strokeDashoffset = len;
+    el.style.opacity = '0';
+
+    var phase = 'waiting'; // waiting -> drawing -> pausing -> erasing -> cooldown
+    var phaseStart = 0;
+    var fadeIn = 300;
+    var fadeOut = 400;
+
+    function tick(ts){
+      if(!phaseStart) phaseStart = ts;
+      var elapsed = ts - phaseStart;
+
+      if(phase === 'waiting'){
+        if(elapsed >= pauseBefore){
+          phase = 'drawing';
+          phaseStart = ts;
+        }
+      }
+      else if(phase === 'drawing'){
+        var p = Math.min(elapsed / duration, 1);
+        // Ease out cubic
+        var ease = 1 - Math.pow(1 - p, 3);
+        el.style.strokeDashoffset = len * (1 - ease);
+        // Fade in at start
+        el.style.opacity = Math.min(elapsed / fadeIn, 1) * parseFloat(el.getAttribute('opacity') || 1);
+        if(p >= 1){
+          phase = 'pausing';
+          phaseStart = ts;
+        }
+      }
+      else if(phase === 'pausing'){
+        el.style.strokeDashoffset = '0';
+        if(elapsed >= pauseAfter){
+          phase = 'erasing';
+          phaseStart = ts;
+        }
+      }
+      else if(phase === 'erasing'){
+        var p2 = Math.min(elapsed / fadeOut, 1);
+        el.style.opacity = (1 - p2) * parseFloat(el.getAttribute('opacity') || 1);
+        if(p2 >= 1){
+          el.style.strokeDashoffset = len;
+          el.style.opacity = '0';
+          phase = 'waiting';
+          phaseStart = ts;
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  // === ROUTE DRAW LOOP ===
+  var routeLen = routePath.getTotalLength();
+
+  function startRouteLoop(){
+    routePath.style.strokeDasharray = routeLen;
+    routePath.style.strokeDashoffset = routeLen;
+    routeGlow.style.strokeDasharray = routeLen;
+    routeGlow.style.strokeDashoffset = routeLen;
+    routeGlow.style.opacity = '0';
+
+    var phase = 'drawing';
+    var phaseStart = 0;
+    var drawDur = 3000;
+    var pauseDur = 2000;
+    var fadeDur = 800;
+
+    function tick(ts){
+      if(!phaseStart) phaseStart = ts;
+      var elapsed = ts - phaseStart;
+
+      if(phase === 'drawing'){
+        var p = Math.min(elapsed / drawDur, 1);
+        var ease = 1 - Math.pow(1 - p, 3);
+        var offset = routeLen * (1 - ease);
+        routePath.style.strokeDashoffset = offset;
+        routeGlow.style.strokeDashoffset = offset;
+        routeGlow.style.opacity = 0.25 * Math.min(elapsed / 500, 1);
+        routePath.style.opacity = 0.90;
+        if(p >= 1){
+          phase = 'pausing';
+          phaseStart = ts;
+        }
+      }
+      else if(phase === 'pausing'){
+        routePath.style.strokeDashoffset = '0';
+        routeGlow.style.strokeDashoffset = '0';
+        if(elapsed >= pauseDur){
+          phase = 'fading';
+          phaseStart = ts;
+        }
+      }
+      else if(phase === 'fading'){
+        var p2 = Math.min(elapsed / fadeDur, 1);
+        routePath.style.opacity = 0.90 * (1 - p2);
+        routeGlow.style.opacity = 0.25 * (1 - p2);
+        if(p2 >= 1){
+          routePath.style.strokeDashoffset = routeLen;
+          routeGlow.style.strokeDashoffset = routeLen;
+          routePath.style.opacity = '0';
+          routeGlow.style.opacity = '0';
+          phase = 'cooldown';
+          phaseStart = ts;
+        }
+      }
+      else if(phase === 'cooldown'){
+        if(elapsed >= 500){
+          phase = 'drawing';
+          phaseStart = ts;
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  // === MAIN ANIMATION SEQUENCE ===
+  function startAnimation(){
+    if(animated) return;
+    animated = true;
+
+    // 1. Street bases fade-in
+    var bases = document.querySelectorAll('.street-base');
+    bases.forEach(function(s){ s.classList.add('visible') });
+
+    // 2. Intersections (400ms)
+    setTimeout(function(){
+      var ints = document.querySelectorAll('.intersection');
+      ints.forEach(function(i){ i.classList.add('visible') });
+    }, 400);
+
+    // 3. Street draw loops (600ms) — each street starts its own draw loop
+    setTimeout(function(){
+      var draws = document.querySelectorAll('.street-draw');
+      draws.forEach(function(el){
+        var dur = parseInt(el.dataset.dur) || 4000;
+        var delay = parseInt(el.dataset.delay) || 0;
+        var pause = parseInt(el.dataset.pause) || 1500;
+        createDrawLoop(el, dur, pause, delay);
+      });
+    }, 600);
+
+    // 4. Route draw loop (800ms)
+    setTimeout(function(){
+      startRouteLoop();
+    }, 800);
+
+    // 5. Pin bounce (2800ms)
+    setTimeout(function(){
+      pinGroup.classList.add('animate');
+    }, 2800);
+
+    // 6. Labels (3200ms)
+    setTimeout(function(){
+      var labels = document.querySelectorAll('.map-text-label');
+      labels.forEach(function(l){ l.classList.add('visible') });
+      distLabel.setAttribute('opacity', '0.35');
+      distLabel.style.transition = 'opacity 0.8s ease';
+    }, 3200);
+  }
+
+  // IntersectionObserver
+  if('IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          startAnimation();
+          obs.unobserve(e.target);
+        }
+      });
+    }, {threshold: 0.3});
+    obs.observe(container);
+  } else {
+    startAnimation();
+  }
+
+  // Hover parallax
+  container.addEventListener('mousemove', function(e){
+    var rect = container.getBoundingClientRect();
+    var x = (e.clientX - rect.left) / rect.width - 0.5;
+    var y = (e.clientY - rect.top) / rect.height - 0.5;
+    var svg = container.querySelector('.map-svg');
+    svg.style.transform = 'translate(' + (x * 5) + 'px,' + (y * 5) + 'px)';
+  });
+
+  container.addEventListener('mouseleave', function(){
+    var svg = container.querySelector('.map-svg');
+    svg.style.transform = 'translate(0,0)';
+    svg.style.transition = 'transform 0.4s ease';
+    setTimeout(function(){ svg.style.transition = '' }, 400);
+  });
+
+  // Click
+  container.addEventListener('click', function(){
+    window.open('https://maps.google.com/maps?q=R.+Galileu+Galilei,+1685+-+Jardim+Iraj%C3%A1,+Ribeir%C3%A3o+Preto+-+SP', '_blank');
+  });
+
+  // Keyboard
+  container.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      container.click();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

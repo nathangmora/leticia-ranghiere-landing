@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa - Dra. Leticia Ranghiere</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+  :root {
+    --bg: #0a0a09;
+    --surface: #2C2C2A;
+    --accent: #C8A88E;
+    --card-bg: rgba(15,15,13,0.92);
+  }
+
+  body {
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .map-section {
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 16px 24px;
+  }
+
+  .map-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.5;
+    margin-bottom: 16px;
+  }
+
+  .map-wrapper {
+    position: relative;
+    width: 100%;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+
+  #map {
+    width: 100%;
+    height: 280px;
+    z-index: 1;
+  }
+
+  /* Remove Leaflet default UI clutter */
+  .leaflet-control-attribution { display: none !important; }
+  .leaflet-control-zoom { display: none !important; }
+
+  /* Vignette overlay */
+  .map-vignette {
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    background: radial-gradient(ellipse 80% 70% at 55% 45%, transparent 40%, rgba(10,10,9,0.75) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* CTA popup above pin */
+  .pin-cta {
+    background: var(--card-bg);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(200,168,142,0.15);
+    border-radius: 16px;
+    padding: 14px 18px;
+    text-align: center;
+    min-width: 220px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .pin-cta .cta-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #F5F0EB;
+    margin-bottom: 2px;
+  }
+
+  .pin-cta .cta-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 12px;
+  }
+
+  .pin-cta .cta-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 22px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: transform 0.15s, background 0.2s;
+  }
+
+  .pin-cta .cta-btn:active {
+    transform: scale(0.96);
+  }
+
+  /* Custom pin marker */
+  .custom-pin {
+    position: relative;
+    width: 36px;
+    height: 46px;
+  }
+
+  .custom-pin .pin-body {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-shadow: 0 4px 16px rgba(200,168,142,0.5);
+  }
+
+  .custom-pin .pin-inner {
+    width: 14px;
+    height: 14px;
+    background: #F5F0EB;
+    border-radius: 50%;
+    position: absolute;
+    top: 11px;
+    left: 11px;
+    z-index: 1;
+  }
+
+  .custom-pin .pin-shadow {
+    width: 20px;
+    height: 6px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    filter: blur(3px);
+    position: absolute;
+    bottom: 0;
+    left: 8px;
+  }
+
+  /* Route glow breathing (after draw completes) */
+
+  /* Start point pulse */
+  .start-point {
+    width: 14px;
+    height: 14px;
+    position: relative;
+  }
+
+  .start-point .dot {
+    width: 10px;
+    height: 10px;
+    background: #888880;
+    border-radius: 50%;
+    border: 2px solid #555;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+  }
+
+  .start-point::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 1.5px solid #888880;
+    animation: startPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes startPulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.6); opacity: 0; }
+  }
+
+  /* Pin glow pulse */
+  .custom-pin::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    animation: glowPulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.8); opacity: 0; }
+  }
+
+  /* Hide pin + start point until fly-in triggers them */
+  .leaflet-marker-icon { opacity: 0; transition: opacity 0.3s ease; }
+  .leaflet-marker-icon.show { opacity: 1; }
+
+  /* Pin entrance animation */
+  @keyframes pinDrop {
+    0% { transform: translateY(-40px); opacity: 0; }
+    60% { transform: translateY(4px); opacity: 1; }
+    80% { transform: translateY(-2px); }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  .pin-animated {
+    animation: pinDrop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* Leaflet popup override */
+  .leaflet-popup-content-wrapper {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+  }
+  .leaflet-popup-content {
+    margin: 0 !important;
+    line-height: normal !important;
+  }
+  .leaflet-popup-tip-container { display: none !important; }
+  .leaflet-popup-close-button { display: none !important; }
+
+  /* Address card below */
+  .map-address {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    background: var(--surface);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+
+  .map-address:hover { background: #353533; }
+
+  .map-address-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(200,168,142,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .map-address-icon svg { width: 20px; height: 20px; }
+
+  .map-address-text { flex: 1; min-width: 0; }
+
+  .map-address-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #F5F0EB;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .map-address-sub {
+    font-size: 12px;
+    color: var(--accent);
+    opacity: 0.6;
+    margin-top: 2px;
+  }
+
+  .map-address-arrow {
+    font-size: 16px;
+    color: var(--accent);
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<section class="map-section">
+  <div class="map-label">Localiza&ccedil;&atilde;o</div>
+
+  <div class="map-wrapper">
+    <div id="map"></div>
+    <div class="map-vignette"></div>
+  </div>
+
+  <a class="map-address"
+     href="https://maps.google.com/maps?q=R.+Galileu+Galilei,+1685+-+Jardim+Iraj%C3%A1,+Ribeir%C3%A3o+Preto+-+SP"
+     target="_blank" rel="noopener noreferrer">
+    <div class="map-address-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#C8A88E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+    </div>
+    <div class="map-address-text">
+      <div class="map-address-title">Ribeir&atilde;o Preto, SP</div>
+      <div class="map-address-sub">R. Galileu Galilei, 1685 &mdash; Jd. Iraj&aacute;</div>
+    </div>
+    <span class="map-address-arrow">&rarr;</span>
+  </a>
+</section>
+
+<script>
+(function() {
+  // Clinic coordinates: R. Galileu Galilei, 1685 - Jardim Irajá, Ribeirão Preto
+  var lat = -21.2117037;
+  var lng = -47.8114454;
+
+  // Map starts at final position — no flyTo (causes SVG regen + blur)
+  var map = L.map('map', {
+    center: [lat, lng],
+    zoom: 17,
+    zoomControl: false,
+    attributionControl: false,
+    dragging: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    touchZoom: false,
+    boxZoom: false,
+    keyboard: false
+  });
+
+  // CartoDB Dark Matter tiles — free, no API key
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19
+  }).addTo(map);
+
+  // Route coordinates (real streets via OSRM routing)
+  var routeCoords = [
+    [-21.214487, -47.816036],
+    [-21.214275, -47.815948],
+    [-21.214217, -47.816091],
+    [-21.214506, -47.816223],
+    [-21.214568, -47.81607],
+    [-21.214592, -47.816009],
+    [-21.21462, -47.815941],
+    [-21.214676, -47.815805],
+    [-21.214733, -47.815667],
+    [-21.214754, -47.815617],
+    [-21.214799, -47.815516],
+    [-21.214815, -47.815482],
+    [-21.214986, -47.815102],
+    [-21.215704, -47.815137],
+    [-21.215781, -47.815137],
+    [-21.21619, -47.815156],
+    [-21.216284, -47.815177],
+    [-21.21641, -47.815206],
+    [-21.216589, -47.815247],
+    [-21.216745, -47.81533],
+    [-21.216897, -47.81547],
+    [-21.217082, -47.815694],
+    [-21.217342, -47.816048],
+    [-21.217405, -47.816195],
+    [-21.217416, -47.816314],
+    [-21.217416, -47.816477],
+    [-21.217269, -47.817356],
+    [-21.217133, -47.817779],
+    [-21.217093, -47.818005],
+    [-21.217107, -47.818075],
+    [-21.217126, -47.818109],
+    [-21.217156, -47.818135],
+    [-21.217228, -47.81815],
+    [-21.217264, -47.818139],
+    [-21.217418, -47.81771],
+    [-21.217554, -47.817385],
+    [-21.217919, -47.816292],
+    [-21.217974, -47.816195],
+    [-21.21806, -47.816123],
+    [-21.218134, -47.816067],
+    [-21.21829, -47.816082],
+    [-21.218554, -47.816071],
+    [-21.218649, -47.816061],
+    [-21.218784, -47.816024],
+    [-21.218855, -47.815997],
+    [-21.218924, -47.815891],
+    [-21.218967, -47.815771],
+    [-21.218981, -47.815643],
+    [-21.218966, -47.815516],
+    [-21.218924, -47.815387],
+    [-21.218508, -47.815191],
+    [-21.218399, -47.815141],
+    [-21.218281, -47.815094],
+    [-21.218188, -47.815066],
+    [-21.218003, -47.815019],
+    [-21.217935, -47.815004],
+    [-21.217505, -47.814959],
+    [-21.217241, -47.814912],
+    [-21.216963, -47.814884],
+    [-21.216646, -47.814852],
+    [-21.216439, -47.814843],
+    [-21.2158, -47.814848],
+    [-21.215188, -47.814848],
+    [-21.214666, -47.814827],
+    [-21.214463, -47.814797],
+    [-21.214215, -47.814753],
+    [-21.214011, -47.814698],
+    [-21.213819, -47.81463],
+    [-21.212156, -47.813855],
+    [-21.211348, -47.81348],
+    [-21.211112, -47.813369],
+    [-21.210905, -47.813267],
+    [-21.211164, -47.812593],
+    [-21.211452, -47.811909],
+    [-21.211663, -47.811383],
+    [-21.2117037, -47.8114454]
+  ];
+
+  // Keep original center/zoom on destination
+
+  // Route lines — start empty, drawn progressively via JS
+  var routeGlow = L.polyline([], {
+    color: '#C8A88E',
+    weight: 8,
+    opacity: 0.15,
+    lineCap: 'round',
+    lineJoin: 'round'
+  }).addTo(map);
+
+  var routeLine = L.polyline([], {
+    color: '#C8A88E',
+    weight: 3,
+    opacity: 0.9,
+    lineCap: 'round',
+    lineJoin: 'round'
+  }).addTo(map);
+
+  // Start point — hidden until animation starts
+  var startIcon = L.divIcon({
+    className: '',
+    html: '<div class="start-point"><div class="dot"></div></div>',
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+  });
+  var startMarker = L.marker(routeCoords[0], { icon: startIcon, interactive: false }).addTo(map);
+
+  // Custom pin icon
+  var pinIcon = L.divIcon({
+    className: '',
+    html: '<div class="custom-pin pin-animated">' +
+            '<div class="pin-body"></div>' +
+            '<div class="pin-inner"></div>' +
+            '<div class="pin-shadow"></div>' +
+          '</div>',
+    iconSize: [36, 46],
+    iconAnchor: [18, 46],
+    popupAnchor: [0, -50]
+  });
+
+  // Add marker with popup CTA
+  var marker = L.marker([lat, lng], { icon: pinIcon }).addTo(map);
+
+  // CTA popup content
+  var popupContent =
+    '<div class="pin-cta">' +
+      '<div class="cta-title">R. Galileu Galilei, 1685</div>' +
+      '<div class="cta-sub">Jardim Iraj\u00e1 \u00b7 Ribeir\u00e3o Preto, SP</div>' +
+      '<a class="cta-btn" href="https://wa.me/5516991420404?text=Ol%C3%A1!%20Vi%20a%20localiza%C3%A7%C3%A3o.%20Gostaria%20de%20agendar" target="_blank" rel="noopener">' +
+        'Agendar avalia\u00e7\u00e3o \u2192' +
+      '</a>' +
+    '</div>';
+
+  var popup = L.popup({
+    closeButton: false,
+    closeOnClick: false,
+    autoClose: false,
+    className: 'custom-popup',
+    offset: [0, -4]
+  }).setContent(popupContent);
+
+  // Bind popup but don't open yet
+  marker.bindPopup(popup);
+
+  // Pins start hidden via CSS (.leaflet-marker-icon { opacity: 0 })
+
+  // Invalidate size after load
+  setTimeout(function() { map.invalidateSize(); }, 100);
+
+  // === FLY-IN ANIMATION SEQUENCE ===
+  var hasFlown = false;
+
+  function startFlyIn() {
+    if (hasFlown) return;
+    hasFlown = true;
+
+    // Interpolate for smooth drawing
+    function lerp(coords, n) {
+      var r = [];
+      for (var i = 0; i < coords.length - 1; i++) {
+        var a = coords[i], b = coords[i + 1];
+        for (var j = 0; j < n; j++) {
+          var t = j / n;
+          r.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+        }
+      }
+      r.push(coords[coords.length - 1]);
+      return r;
+    }
+
+    var smooth = lerp(routeCoords, 5);
+    var total = smooth.length;
+    var duration = 3500;
+    var drawn = [];
+    var idx = 0;
+    var t0 = performance.now();
+
+    // Show start point
+    var startEl = startMarker.getElement();
+    if (startEl) startEl.classList.add('show');
+
+    // === DRAW ROUTE progressively (map is static, no flyTo) ===
+    function draw(now) {
+      var p = Math.min((now - t0) / duration, 1);
+      // ease-in-out
+      var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+      var target = Math.floor(e * total);
+
+      if (target > idx) {
+        for (var i = idx; i <= target && i < total; i++) {
+          drawn.push(smooth[i]);
+        }
+        idx = target;
+        routeLine.setLatLngs(drawn);
+        routeGlow.setLatLngs(drawn);
+      }
+
+      if (p < 1) {
+        requestAnimationFrame(draw);
+      } else {
+        // Complete
+        routeLine.setLatLngs(smooth);
+        routeGlow.setLatLngs(smooth);
+
+        // Pin drop
+        setTimeout(function() {
+          var el = marker.getElement();
+          if (el) {
+            el.classList.add('show');
+            var pinDiv = el.querySelector('.custom-pin');
+            if (pinDiv) {
+              pinDiv.classList.remove('pin-animated');
+              void pinDiv.offsetWidth;
+              pinDiv.classList.add('pin-animated');
+            }
+          }
+        }, 400);
+
+        // CTA popup
+        setTimeout(function() {
+          marker.openPopup();
+        }, 1200);
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  // Trigger on scroll into view
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        // Small delay before starting
+        setTimeout(startFlyIn, 300);
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  observer.observe(document.querySelector('.map-wrapper'));
+})();
+</script>
+
+</body>
+</html>

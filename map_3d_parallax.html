@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa 3D - Dra. Leticia Ranghiere</title>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+  :root {
+    --bg: #0a0a09;
+    --surface: #2C2C2A;
+    --road: #4A4A46;
+    --accent: #C8A88E;
+    --accent-glow: rgba(200,168,142,0.45);
+    --grid: rgba(200,168,142,0.10);
+    --green: rgba(100,120,80,0.10);
+    --text: #C8A88E;
+    --card-bg: rgba(15,15,13,0.92);
+  }
+
+  body {
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .map-scene {
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 0 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .viewport-3d {
+    width: calc(100% - 32px);
+    max-width: 388px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+  }
+
+  .map-floor {
+    width: 100%;
+    position: relative;
+    border-radius: 24px;
+    will-change: transform;
+    overflow: hidden;
+  }
+
+  .map-floor.animate {
+    animation: cameraMove 8s cubic-bezier(0.25,0.1,0.25,1) forwards;
+  }
+
+  .map-floor.breathing {
+    animation: breathe 6s ease-in-out infinite;
+  }
+
+  @keyframes cameraMove {
+    0% {
+      transform: scale(2.5) translate(-20px, 15px);
+      opacity: 0.7;
+    }
+    25% {
+      transform: scale(1) translate(0, 0);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) translate(0, 0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes breathe {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.008);
+    }
+  }
+
+  /* Map surface */
+  .map-surface {
+    width: 100%;
+    background: var(--surface);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Noise texture overlay */
+  .map-surface::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 128px 128px;
+    opacity: 0.5;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Parallax content layers */
+  .layer-streets,
+  .layer-route,
+  .layer-pins,
+  .layer-labels {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.15s ease-out;
+    pointer-events: none;
+  }
+  .layer-streets { z-index: 2; }
+  .layer-route { z-index: 3; }
+  .layer-labels { z-index: 4; }
+  .layer-pins { z-index: 5; pointer-events: auto; }
+
+  .map-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Pin drop animation */
+  .pin-group {
+    opacity: 0;
+    transform: translateZ(120px);
+    will-change: transform, opacity;
+  }
+  .pin-group.dropped {
+    animation: pinDrop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .pin-group.floating {
+    animation: pinFloat 3s ease-in-out infinite;
+  }
+
+  @keyframes pinDrop {
+    0% { opacity: 0; transform: translate(0, -30px); }
+    60% { opacity: 1; transform: translate(0, 2px); }
+    80% { transform: translate(0, -1px); }
+    100% { opacity: 1; transform: translate(0, 0); }
+  }
+
+  @keyframes pinFloat {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(0, -3px); }
+  }
+
+  /* Pin shadow */
+  .pin-shadow {
+    opacity: 0.3;
+    transform-origin: center;
+  }
+  .pin-group.floating .pin-shadow {
+    animation: shadowPulse 3s ease-in-out infinite;
+  }
+  @keyframes shadowPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.2; transform: scale(0.85); }
+  }
+
+  /* Route draw */
+  .route-path {
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+  }
+  .route-path.drawing {
+    animation: drawRoute 2s ease-out forwards;
+  }
+  .route-path.glowing {
+    animation: routeGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes drawRoute {
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes routeGlow {
+    0%, 100% { filter: drop-shadow(0 0 3px var(--accent-glow)); opacity: 1; }
+    50% { filter: drop-shadow(0 0 8px var(--accent-glow)); opacity: 0.85; }
+  }
+
+  /* Destination pin glow ring */
+  .dest-glow {
+    opacity: 0;
+  }
+  .dest-glow.active {
+    animation: glowRing 2.5s ease-in-out infinite;
+  }
+  @keyframes glowRing {
+    0%, 100% { opacity: 0; r: 8; }
+    50% { opacity: 0.5; r: 16; }
+  }
+
+  /* Vignette — inside the map surface */
+  .vignette {
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    background: radial-gradient(ellipse 70% 60% at 55% 45%, transparent 30%, rgba(26,26,24,0.85) 100%);
+    pointer-events: none;
+    z-index: 6;
+  }
+
+  /* CTA overlay */
+  .cta-overlay {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+  }
+  .cta-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .cta-card {
+    background: var(--card-bg);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(200,168,142,0.15);
+    border-radius: 16px;
+    padding: 16px 20px;
+    text-align: center;
+    min-width: 240px;
+    position: relative;
+  }
+
+  /* Speech bubble pointer */
+  .cta-card::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid rgba(15,15,13,0.92);
+  }
+
+  .cta-card .cta-address {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+  .cta-card .cta-neighborhood {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 12px;
+  }
+  .cta-card .cta-button {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .cta-card .cta-button:active {
+    transform: scale(0.97);
+  }
+
+  /* Address card */
+  .map-address {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid rgba(200,168,142,0.1);
+    border-radius: 16px;
+    padding: 14px 18px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 13px;
+    margin: 20px 16px 0;
+    width: calc(100% - 32px);
+    max-width: 388px;
+    transition: border-color 0.2s;
+  }
+  .map-address:active {
+    border-color: rgba(200,168,142,0.3);
+  }
+  .map-address .pin-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    color: var(--accent);
+  }
+  .map-address .arrow {
+    flex-shrink: 0;
+    margin-left: auto;
+    opacity: 0.5;
+    font-size: 16px;
+  }
+
+  /* CTA positioning */
+  .cta-overlay {
+    top: 10px;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 400px) {
+    .viewport-3d {
+      width: calc(100% - 24px);
+    }
+    .cta-card {
+      min-width: 210px;
+      padding: 14px 16px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<section class="map-scene" id="mapScene">
+  <div class="viewport-3d">
+    <div class="map-floor" id="mapFloor">
+      <div class="map-surface">
+        <!-- Base layer: grid + parks -->
+        <svg class="map-svg" viewBox="0 0 390 280" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1">
+          <defs>
+            <filter id="routeGlow">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="pinShadow"><feGaussianBlur stdDeviation="2"/></filter>
+          </defs>
+          <rect width="390" height="280" fill="var(--surface)" rx="0"/>
+          <!-- Parks -->
+          <rect x="60" y="170" width="45" height="35" rx="6" fill="rgba(100,120,80,0.10)"/>
+          <rect x="220" y="85" width="55" height="40" rx="6" fill="rgba(100,120,80,0.10)"/>
+          <rect x="300" y="160" width="40" height="50" rx="6" fill="rgba(100,120,80,0.08)"/>
+          <rect x="140" y="210" width="50" height="30" rx="6" fill="rgba(100,120,80,0.07)"/>
+          <!-- Grid -->
+          <g stroke="rgba(200,168,142,0.10)" stroke-width="0.5" fill="none" stroke-linecap="round">
+            <line x1="20" y1="60" x2="370" y2="60"/><line x1="20" y1="100" x2="370" y2="100"/>
+            <line x1="20" y1="140" x2="370" y2="140"/><line x1="20" y1="180" x2="370" y2="180"/>
+            <line x1="20" y1="220" x2="370" y2="220"/>
+            <line x1="60" y1="20" x2="60" y2="260"/><line x1="120" y1="20" x2="120" y2="260"/>
+            <line x1="180" y1="20" x2="180" y2="260"/><line x1="240" y1="20" x2="240" y2="260"/>
+            <line x1="300" y1="20" x2="300" y2="260"/><line x1="360" y1="20" x2="360" y2="260"/>
+          </g>
+        </svg>
+
+        <!-- Layer 1: Streets (moves slower — depth) -->
+        <div class="layer-streets" id="layerStreets">
+          <svg viewBox="0 0 390 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+            <g stroke="var(--road)" stroke-linecap="round" fill="none">
+              <path d="M 147 78 L 131 143 L 108 213 L 87 273" stroke-width="7"/>
+              <path d="M 164 80 L 244 101 L 375 131" stroke-width="6"/>
+              <path d="M 138 112 L 173 123 L 204 135" stroke-width="5"/>
+              <path d="M 86 280 L 108 227 L 127 140" stroke-width="4.5"/>
+              <path d="M 279 233 L 228 193 L 178 157" stroke-width="4.5"/>
+              <path d="M 198 99 L 189 115 L 182 128" stroke-width="4"/>
+              <path d="M 179 85 L 163 115 L 146 147" stroke-width="4"/>
+              <path d="M 252 161 L 179 163 L 113 164" stroke-width="4.5"/>
+              <path d="M 127 140 L 153 149 L 178 157" stroke-width="4"/>
+              <path d="M 369 157 L 326 165 L 277 177" stroke-width="4.5"/>
+            </g>
+            <g stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="6 5" stroke-linecap="round" fill="none">
+              <path d="M 147 78 L 131 143 L 108 213 L 87 273"/>
+              <path d="M 164 80 L 244 101 L 375 131"/>
+              <path d="M 138 112 L 173 123 L 204 135"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Layer 2: Route (moves medium) -->
+        <div class="layer-route" id="layerRoute">
+          <svg viewBox="0 0 390 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+            <defs>
+              <filter id="routeGlow2"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <!-- Glow bg -->
+            <path d="M 87 273 L 108 213 L 131 143 L 138 112 L 173 123 L 195 140"
+                  stroke="var(--accent)" stroke-width="10" stroke-linecap="round" fill="none"
+                  filter="url(#routeGlow2)" opacity="0" id="routeGlowBg"/>
+            <!-- Route line -->
+            <path class="route-path" id="routePath"
+                  d="M 87 273 L 108 213 L 131 143 L 138 112 L 173 123 L 195 140"
+                  stroke="var(--accent)" stroke-width="3.5" stroke-linecap="round"
+                  fill="none" filter="url(#routeGlow2)" opacity="0.9"/>
+            <!-- Origin point -->
+            <circle cx="87" cy="273" r="5" fill="#888880" opacity="0.7"/>
+            <circle cx="87" cy="273" r="8" fill="none" stroke="#888880" stroke-width="1" opacity="0.2"/>
+          </svg>
+        </div>
+
+        <!-- Layer 3: Labels (moves medium-fast) -->
+        <div class="layer-labels" id="layerLabels">
+          <svg viewBox="0 0 390 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+            <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="5.5" fill="rgba(200,168,142,0.3)" font-weight="500" class="map-text-labels" style="opacity:0;transition:opacity 0.8s ease">
+              <text x="90" y="160" transform="rotate(-68, 90, 160)">Av. Pres. Vargas</text>
+              <text x="230" y="90" transform="rotate(-10, 230, 90)">Av. Bianco Molina</text>
+              <text x="150" y="108" transform="rotate(-8, 150, 108)">R. Galileu Galilei</text>
+              <text x="290" y="170" transform="rotate(-8, 290, 170)">R. Toronto</text>
+              <text x="185" y="160" transform="rotate(-2, 185, 160)">R. J. da Costa Mello</text>
+            </g>
+            <!-- Neighborhood label -->
+            <text x="250" y="50" font-family="-apple-system, sans-serif" font-size="7" font-weight="600" letter-spacing="1.5" fill="#888880" opacity="0" class="map-text-labels" style="transition:opacity 0.8s ease 0.2s">JD. IRAJ&Aacute;</text>
+          </svg>
+        </div>
+
+        <!-- Layer 4: Pins (moves fastest — closest to viewer) -->
+        <div class="layer-pins" id="layerPins">
+          <svg viewBox="0 0 390 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+            <defs><filter id="pinSh"><feGaussianBlur stdDeviation="2"/></filter></defs>
+
+            <!-- Pin 1: Start -->
+            <g class="pin-group" id="pin1">
+              <ellipse class="pin-shadow" cx="87" cy="275" rx="5" ry="2" fill="rgba(0,0,0,0.4)" filter="url(#pinSh)"/>
+              <g transform="translate(87,273)">
+                <path d="M 0 0 C -6 -4 -8 -10 -8 -14 A 8 8 0 1 1 8 -14 C 8 -10 6 -4 0 0 Z" fill="var(--accent)" opacity="0.7"/>
+                <circle cx="0" cy="-14" r="3" fill="white" opacity="0.9"/>
+              </g>
+            </g>
+
+            <!-- Pin 2: Mid -->
+            <g class="pin-group" id="pin2">
+              <ellipse class="pin-shadow" cx="131" cy="145" rx="5" ry="2" fill="rgba(0,0,0,0.4)" filter="url(#pinSh)"/>
+              <g transform="translate(131,143)">
+                <path d="M 0 0 C -6 -4 -8 -10 -8 -14 A 8 8 0 1 1 8 -14 C 8 -10 6 -4 0 0 Z" fill="var(--accent)" opacity="0.6"/>
+                <circle cx="0" cy="-14" r="3" fill="white" opacity="0.9"/>
+              </g>
+            </g>
+
+            <!-- Pin 3: Near dest -->
+            <g class="pin-group" id="pin3">
+              <ellipse class="pin-shadow" cx="173" cy="125" rx="5" ry="2" fill="rgba(0,0,0,0.4)" filter="url(#pinSh)"/>
+              <g transform="translate(173,123)">
+                <path d="M 0 0 C -6 -4 -8 -10 -8 -14 A 8 8 0 1 1 8 -14 C 8 -10 6 -4 0 0 Z" fill="var(--accent)" opacity="0.6"/>
+                <circle cx="0" cy="-14" r="3" fill="white" opacity="0.9"/>
+              </g>
+            </g>
+
+            <!-- Pin 4: DESTINATION (larger, glow) -->
+            <g class="pin-group" id="pinDest">
+              <circle class="dest-glow" id="destGlow" cx="195" cy="140" r="8" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity="0"/>
+              <ellipse class="pin-shadow" cx="195" cy="143" rx="6" ry="2.5" fill="rgba(0,0,0,0.5)" filter="url(#pinSh)"/>
+              <g transform="translate(195,140)">
+                <path d="M 0 0 C -7.5 -5 -10 -12.5 -10 -17.5 A 10 10 0 1 1 10 -17.5 C 10 -12.5 7.5 -5 0 0 Z" fill="var(--accent)"/>
+                <circle cx="0" cy="-17.5" r="4" fill="white"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Vignette (inside surface) -->
+        <div class="vignette"></div>
+      </div>
+    </div>
+
+    <!-- CTA overlay (above everything) -->
+    <div class="cta-overlay" id="ctaOverlay">
+      <div class="cta-card">
+        <div class="cta-address">R. Galileu Galilei, 1685</div>
+        <div class="cta-neighborhood">Jardim Iraj&aacute; &middot; Ribeir&atilde;o Preto, SP</div>
+        <a class="cta-button" href="https://wa.me/5516991420404?text=Ol%C3%A1!%20Vi%20a%20localiza%C3%A7%C3%A3o.%20Gostaria%20de%20agendar" target="_blank" rel="noopener">
+          Agendar avalia&ccedil;&atilde;o &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Address link card -->
+  <a class="map-address" href="https://maps.google.com/maps?q=R.+Galileu+Galilei,+1685+-+Jardim+Iraj%C3%A1,+Ribeir%C3%A3o+Preto+-+SP" target="_blank" rel="noopener">
+    <svg class="pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+    <span>Ribeir&atilde;o Preto, SP &sol; R. Galileu Galilei, 1685 &mdash; Jd. Iraj&aacute;</span>
+    <span class="arrow">&rsaquo;</span>
+  </a>
+</section>
+
+<script>
+(function() {
+  var mapFloor = document.getElementById('mapFloor');
+  var mapSurface = document.querySelector('.map-surface');
+  var routePath = document.getElementById('routePath');
+  var routeGlowBg = document.getElementById('routeGlowBg');
+  var ctaOverlay = document.getElementById('ctaOverlay');
+  var destGlow = document.getElementById('destGlow');
+  var labels = document.querySelectorAll('.map-text-labels');
+  var pins = [
+    document.getElementById('pin1'),
+    document.getElementById('pin2'),
+    document.getElementById('pin3'),
+    document.getElementById('pinDest')
+  ];
+
+  // Parallax layers — different speeds create depth
+  var layers = {
+    streets: { el: document.getElementById('layerStreets'), speed: 0.3 },
+    route:   { el: document.getElementById('layerRoute'),   speed: 0.5 },
+    labels:  { el: document.getElementById('layerLabels'),  speed: 0.6 },
+    pins:    { el: document.getElementById('layerPins'),     speed: 0.9 }
+  };
+
+  // Route dasharray setup
+  var routeLen = routePath.getTotalLength();
+  routePath.style.strokeDasharray = routeLen;
+  routePath.style.strokeDashoffset = routeLen;
+
+  var hasTriggered = false;
+
+  // === MOUSE PARALLAX ===
+  mapSurface.addEventListener('mousemove', function(e) {
+    var rect = mapSurface.getBoundingClientRect();
+    var x = (e.clientX - rect.left) / rect.width - 0.5;  // -0.5 to 0.5
+    var y = (e.clientY - rect.top) / rect.height - 0.5;
+
+    Object.keys(layers).forEach(function(key) {
+      var layer = layers[key];
+      var tx = x * layer.speed * 12;
+      var ty = y * layer.speed * 8;
+      layer.el.style.transform = 'translate(' + tx + 'px, ' + ty + 'px)';
+    });
+  });
+
+  mapSurface.addEventListener('mouseleave', function() {
+    Object.keys(layers).forEach(function(key) {
+      layers[key].el.style.transform = 'translate(0, 0)';
+      layers[key].el.style.transition = 'transform 0.4s ease-out';
+      setTimeout(function() { layers[key].el.style.transition = 'transform 0.15s ease-out'; }, 400);
+    });
+  });
+
+  // === ANIMATION SEQUENCE ===
+  function startAnimation() {
+    if (hasTriggered) return;
+    hasTriggered = true;
+
+    // Camera zoom-out
+    mapFloor.classList.add('animate');
+
+    // Route draw at 1.5s
+    setTimeout(function() {
+      routePath.style.transition = 'stroke-dashoffset 2.5s ease-out';
+      routePath.style.strokeDashoffset = '0';
+      // Glow bg fades in
+      routeGlowBg.style.transition = 'opacity 2s ease 0.5s';
+      routeGlowBg.style.opacity = '0.2';
+      routeGlowBg.style.strokeDasharray = routeLen;
+      routeGlowBg.style.strokeDashoffset = '0';
+    }, 1500);
+
+    // Route glow breathing after draw
+    setTimeout(function() {
+      routePath.classList.add('glowing');
+    }, 4200);
+
+    // Labels fade in at 2s
+    setTimeout(function() {
+      labels.forEach(function(l) { l.style.opacity = '1'; });
+    }, 2000);
+
+    // Pin drops staggered from 1.8s
+    pins.forEach(function(pin, i) {
+      var delay = 1800 + i * 400;
+      setTimeout(function() { pin.classList.add('dropped'); }, delay);
+      setTimeout(function() {
+        pin.classList.remove('dropped');
+        pin.classList.add('floating');
+      }, delay + 800);
+    });
+
+    // Destination glow ring
+    setTimeout(function() { destGlow.classList.add('active'); }, 3500);
+
+    // CTA at 5s
+    setTimeout(function() { ctaOverlay.classList.add('visible'); }, 5000);
+
+    // Breathing after camera finishes
+    mapFloor.addEventListener('animationend', function handler() {
+      mapFloor.removeEventListener('animationend', handler);
+      mapFloor.classList.remove('animate');
+      mapFloor.classList.add('breathing');
+    });
+  }
+
+  // Click → Google Maps
+  mapSurface.addEventListener('click', function() {
+    window.open('https://maps.google.com/maps?q=R.+Galileu+Galilei,+1685+-+Jardim+Iraj%C3%A1,+Ribeir%C3%A3o+Preto+-+SP', '_blank');
+  });
+  mapSurface.style.cursor = 'pointer';
+
+  // IntersectionObserver
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        startAnimation();
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  observer.observe(document.getElementById('mapScene'));
+})();
+</script>
+
+</body>
+</html>
