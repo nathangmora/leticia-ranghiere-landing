@@ -55,6 +55,11 @@
   <symbol id="icon-star" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></symbol>
 </svg>
 
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+  <img src="logo_lr_transparent.png" alt="Dra. Leticia Ranghiere" class="loading-logo-img">
+</div>
+
 <a href="#hero" class="skip-link">Pular para o conteúdo</a>
 
 <!-- Scroll Progress Bar -->
@@ -94,27 +99,35 @@
 <main>
 <!-- ===== HERO ===== -->
 <section class="hero" id="hero">
-  <div class="hero-photo">
-    <img src="WhatsApp Image 2026-04-02 at 15.48.55.jpeg" alt="Dra. Leticia Ranghiere" width="1440" height="900" fetchpriority="high">
-  </div>
+  <img src="PHOTO-2026-04-04-20-29-24.jpg" alt="" class="hero-bg-full" width="843" height="1264" aria-hidden="true">
+  <div class="hero-bg-gradient"></div>
+  <img src="logo_lr_transparent.png" alt="" class="hero-watermark" aria-hidden="true">
   <div class="hero-particles" id="heroParticles"></div>
-  <div class="hero-content">
-    <p class="hero-overline hero-reveal">Dra. Leticia Ranghiere &mdash; CRO/SP 133.036</p>
-    <h1 id="heroTitle">Realce a beleza que já é sua.</h1>
-    <p class="hero-reveal">Harmonização facial e estética dental com técnica refinada, resultado natural e o cuidado que você merece. Mais de 1.000 pacientes transformados em Ribeirão Preto.</p>
-    <a href="https://wa.me/5516991420404?text=Olá%20Dra.%20Letícia!%20Gostaria%20de%20agendar%20uma%20avaliação.%20Vim%20pelo%20Instagram" class="hero-cta hero-reveal magnetic">
-      <span class="cta-icon">
-        <svg width="24" height="24" fill="#fff"><use href="#icon-whatsapp"/></svg>
-      </span>
-      <span class="cta-text">
-        <strong>Quero minha avaliação personalizada</strong>
-        <span>Atendimento via WhatsApp - resposta em até 2 horas</span>
-      </span>
-    </a>
-    <div class="hero-trust reveal">
-      <span>✓ Avaliação sem compromisso</span>
-      <span>✓ +1.000 pacientes</span>
-      <span>✓ CRO/SP 133.036</span>
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-content">
+        <img src="logo_lr_transparent.png" alt="Logo Dra. Leticia Ranghiere" class="hero-logo hero-reveal" width="220" height="66">
+        <p class="hero-overline hero-reveal">Dra. Leticia Ranghiere &mdash; CRO/SP 133.036</p>
+        <h1 id="heroTitle">Realce a beleza que já é sua.</h1>
+        <p class="hero-reveal">Harmonização facial e estética dental com técnica refinada, resultado natural e o cuidado que você merece. Mais de 1.000 pacientes transformados em Ribeirão Preto.</p>
+        <a href="https://wa.me/5516991420404?text=Olá%20Dra.%20Letícia!%20Gostaria%20de%20agendar%20uma%20avaliação.%20Vim%20pelo%20Instagram" class="hero-cta hero-reveal magnetic">
+          <span class="cta-icon">
+            <svg width="24" height="24" fill="#fff"><use href="#icon-whatsapp"/></svg>
+          </span>
+          <span class="cta-text">
+            <strong>Quero minha avaliação personalizada</strong>
+            <span>Atendimento via WhatsApp - resposta em até 2 horas</span>
+          </span>
+        </a>
+        <div class="hero-trust hero-reveal">
+          <span>✓ Avaliação sem compromisso</span>
+          <span>✓ +1.000 pacientes</span>
+          <span>✓ CRO/SP 133.036</span>
+        </div>
+      </div>
+      <div class="hero-photo">
+        <img src="hero-leticia-recortada.png" alt="Dra. Leticia Ranghiere" class="hero-photo-fg" width="843" height="1264" fetchpriority="high">
+      </div>
     </div>
   </div>
   <div class="scroll-indicator">
@@ -128,18 +141,21 @@
   <div class="container">
     <div class="sobre-grid">
       <div class="sobre-img-wrapper reveal-left">
-        <img src="PHOTO-2026-04-04-20-00-52.jpg" alt="Dra. Leticia Ranghiere atendendo paciente" class="sobre-img" loading="lazy" width="600" height="800">
+        <picture>
+          <source srcset="PHOTO-2026-04-04-20-00-52.webp" type="image/webp">
+          <img src="PHOTO-2026-04-04-20-00-52.jpg" alt="Dra. Leticia Ranghiere atendendo paciente" class="sobre-img" loading="lazy" width="600" height="800">
+        </picture>
       </div>
       <div class="sobre-content">
-        <span class="overline reveal">Sobre a Dra. Leticia</span>
-        <h2 class="reveal">Prazer, Dra. Leticia.</h2>
-        <div class="accent-line reveal"></div>
-        <p class="reveal">Desde o início da minha trajetória na odontologia, pela UNESP, eu sabia que meu trabalho ia além de dentes — era sobre como as pessoas se sentem quando se olham no espelho.</p>
-        <p class="reveal">Ao longo de mais de 5 anos e mais de 1.000 pacientes atendidos, me especializei em estética dental e harmonização facial porque acredito que pequenos ajustes, feitos com técnica e sensibilidade, podem devolver algo muito maior: a vontade de sorrir sem pensar duas vezes.</p>
-        <p class="reveal">Meu consultório em Ribeirão Preto foi pensado para ser um espaço onde você se sente acolhida desde o primeiro momento. Aqui, cada plano de tratamento é individual — porque o seu rosto, o seu sorriso e a sua história são únicos.</p>
-        <p class="reveal sobre-destaque">Se você busca um resultado que as pessoas notem, mas não saibam exatamente o que mudou, estamos falando a mesma língua.</p>
+        <span class="overline reveal-right">Sobre a Dra. Leticia</span>
+        <h2 class="reveal-right">Prazer, Dra. Leticia.</h2>
+        <div class="accent-line reveal-right"></div>
+        <p class="reveal-right">Desde o início da minha trajetória na odontologia, pela UNESP, eu sabia que meu trabalho ia além de dentes — era sobre como as pessoas se sentem quando se olham no espelho.</p>
+        <p class="reveal-right">Ao longo de mais de 5 anos e mais de 1.000 pacientes atendidos, me especializei em estética dental e harmonização facial porque acredito que pequenos ajustes, feitos com técnica e sensibilidade, podem devolver algo muito maior: a vontade de sorrir sem pensar duas vezes.</p>
+        <p class="reveal-right">Meu consultório em Ribeirão Preto foi pensado para ser um espaço onde você se sente acolhida desde o primeiro momento. Aqui, cada plano de tratamento é individual — porque o seu rosto, o seu sorriso e a sua história são únicos.</p>
+        <p class="reveal-right sobre-destaque">Se você busca um resultado que as pessoas notem, mas não saibam exatamente o que mudou, estamos falando a mesma língua.</p>
 
-        <div class="sobre-counters reveal">
+        <div class="sobre-counters reveal-right">
           <div class="counter-item">
             <span class="counter-number" data-target="1000" data-suffix="+">0</span>
             <span class="counter-label">Pacientes</span>
@@ -153,8 +169,8 @@
             <span class="counter-label">Dedicação</span>
           </div>
         </div>
-        <p class="sobre-cro reveal">CRO/SP 133.036</p>
-        <a href="https://wa.me/5516991420404?text=Olá%20Dra.%20Letícia!%20Gostaria%20de%20agendar%20uma%20avaliação.%20Vim%20pelo%20Instagram" class="sobre-cta reveal">Quero conhecer a Dra. Leticia →</a>
+        <p class="sobre-cro reveal-right">CRO/SP 133.036</p>
+        <a href="https://wa.me/5516991420404?text=Olá%20Dra.%20Letícia!%20Gostaria%20de%20agendar%20uma%20avaliação.%20Vim%20pelo%20Instagram" class="sobre-cta reveal-right">Quero conhecer a Dra. Leticia →</a>
       </div>
     </div>
   </div>
@@ -164,13 +180,13 @@
 <section class="servicos" id="servicos">
   <div class="container">
     <div class="section-header">
-      <span class="overline reveal">Tratamentos</span>
-      <h2 class="reveal">Tratamentos que valorizam o que você já tem.</h2>
-      <p class="reveal">Cada procedimento é pensado para realçar a sua beleza natural, com técnica precisa e resultado harmonioso.</p>
+      <span class="overline reveal-left">Tratamentos</span>
+      <h2 class="reveal-left">Tratamentos que valorizam o que você já tem.</h2>
+      <p class="reveal-right">Cada procedimento é pensado para realçar a sua beleza natural, com técnica precisa e resultado harmonioso.</p>
     </div>
 
     <!-- Tab Navigation Apple-style -->
-    <div class="tabnav reveal" id="serviceTabNav">
+    <div class="tabnav reveal-right" id="serviceTabNav">
       <div class="tabnav-items">
         <button class="tabnav-item active" data-tab="0">Harmonização</button>
         <button class="tabnav-item" data-tab="1">Lentes Dentais</button>
@@ -182,7 +198,7 @@
       <div class="tabnav-indicator"></div>
     </div>
 
-    <div class="service-panels" id="servicePanels">
+    <div class="service-panels reveal-left" id="servicePanels">
       <div class="service-panel active" data-panel="0">
         <div class="service-panel-content">
           <div class="service-panel-icon">
@@ -245,7 +261,7 @@
       </div>
     </div>
 
-    <div class="services-cta reveal">
+    <div class="services-cta reveal-left">
       <a href="https://wa.me/5516991420404?text=Olá%20Dra.%20Letícia!%20Gostaria%20de%20agendar%20uma%20avaliação.%20Vim%20pelo%20Instagram" class="sobre-cta">Quero descobrir meu tratamento ideal →</a>
     </div>
   </div>
@@ -255,40 +271,52 @@
 <section class="resultados" id="resultados">
   <div class="container">
     <div class="section-header">
-      <span class="overline overline-dark reveal">Resultados</span>
-      <div class="results-badge reveal">
+      <span class="overline overline-dark reveal-left">Resultados</span>
+      <div class="results-badge reveal-right">
         <span class="results-badge-number">+1.000</span>
         <span class="results-badge-text">pacientes transformados</span>
       </div>
-      <h2 class="reveal">Transformações que falam por si.</h2>
-      <p class="reveal">Cada resultado é único, porque cada paciente é única. Veja o que a técnica certa, no momento certo, pode fazer.</p>
+      <h2 class="reveal-right">Transformações que falam por si.</h2>
+      <p class="reveal-left">Cada resultado é único, porque cada paciente é única. Veja o que a técnica certa, no momento certo, pode fazer.</p>
     </div>
     <div class="resultados-gallery">
       <div class="resultado-card reveal-left">
-        <img src="737e9af6e92200d67f74d1e2b3bc7e7c.jpg" alt="Resultado de tratamento dental" loading="lazy" width="400" height="500">
+        <picture>
+          <source srcset="737e9af6e92200d67f74d1e2b3bc7e7c.webp" type="image/webp">
+          <img src="737e9af6e92200d67f74d1e2b3bc7e7c.jpg" alt="Resultado de tratamento dental" loading="lazy" width="400" height="500">
+        </picture>
         <div class="overlay">
           <p>Mais confiança a cada sorriso.</p>
         </div>
       </div>
       <div class="resultado-card ba-slider reveal-scale" style="transition-delay:.15s" id="baSlider">
         <div class="ba-before">
-          <img src="86c9eb98732773b862390cd105130593.jpg" alt="Antes do tratamento" loading="lazy" width="400" height="500">
+          <picture>
+            <source srcset="86c9eb98732773b862390cd105130593.webp" type="image/webp">
+            <img src="86c9eb98732773b862390cd105130593.jpg" alt="Antes do tratamento" loading="lazy" width="400" height="500">
+          </picture>
         </div>
         <div class="ba-after">
-          <img src="904521b47c29e903be7b18410c1d9b31.jpg" alt="Depois do tratamento — sorriso transformado" loading="lazy" width="400" height="500">
+          <picture>
+            <source srcset="904521b47c29e903be7b18410c1d9b31.webp" type="image/webp">
+            <img src="904521b47c29e903be7b18410c1d9b31.jpg" alt="Depois do tratamento — sorriso transformado" loading="lazy" width="400" height="500">
+          </picture>
         </div>
         <div class="ba-handle" id="baHandle" role="slider" aria-label="Comparar antes e depois" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0"></div>
         <span class="ba-label ba-label-before">Antes</span>
         <span class="ba-label ba-label-after">Depois</span>
       </div>
       <div class="resultado-card reveal-right" style="transition-delay:.3s">
-        <img src="bc0ff64b9c00a8cd12ec6bd2a9f6ebdb.jpg" alt="Sorriso após tratamento estético" loading="lazy" width="400" height="500">
+        <picture>
+          <source srcset="bc0ff64b9c00a8cd12ec6bd2a9f6ebdb.webp" type="image/webp">
+          <img src="bc0ff64b9c00a8cd12ec6bd2a9f6ebdb.jpg" alt="Sorriso após tratamento estético" loading="lazy" width="400" height="500">
+        </picture>
         <div class="overlay">
           <p>Quando a técnica encontra a sensibilidade.</p>
         </div>
       </div>
     </div>
-    <div class="resultados-cta reveal">
+    <div class="resultados-cta reveal-right">
       <a href="https://wa.me/5516991420404?text=Olá%20Dra.%20Letícia!%20Gostaria%20de%20agendar%20uma%20avaliação.%20Vim%20pelo%20Instagram" class="btn-ghost-dark">Quero minha transformação →</a>
     </div>
   </div>
@@ -299,9 +327,9 @@
   <div class="depo-quote-bg" data-parallax-speed="0.5">&ldquo;</div>
   <div class="container">
     <div class="section-header">
-      <span class="overline reveal">Depoimentos</span>
-      <h2 class="reveal">O que dizem quem já passou por aqui.</h2>
-      <div class="rating-summary reveal">
+      <span class="overline reveal-right">Depoimentos</span>
+      <h2 class="reveal-left">O que dizem quem já passou por aqui.</h2>
+      <div class="rating-summary reveal-left">
         <div class="rating-stars">
           <svg class="depo-star"><use href="#icon-star"/></svg>
           <svg class="depo-star"><use href="#icon-star"/></svg>
@@ -384,14 +412,14 @@
         <p class="depo-service">Harmonização Facial</p>
       </div>
     </div>
-    <div class="depo-dots reveal" id="depoDots">
+    <div class="depo-dots reveal-right" id="depoDots">
       <button class="depo-dot active" data-index="0" aria-label="Depoimento 1"></button>
       <button class="depo-dot" data-index="1" aria-label="Depoimento 2"></button>
       <button class="depo-dot" data-index="2" aria-label="Depoimento 3"></button>
       <button class="depo-dot" data-index="3" aria-label="Depoimento 4"></button>
       <button class="depo-dot" data-index="4" aria-label="Depoimento 5"></button>
     </div>
-    <div class="depo-cta reveal">
+    <div class="depo-cta reveal-left">
       <a href="https://wa.me/5516991420404?text=Olá%20Dra.%20Letícia!%20Gostaria%20de%20agendar%20uma%20avaliação.%20Vim%20pelo%20Instagram" class="sobre-cta">Quero agendar minha consulta →</a>
     </div>
   </div>
@@ -401,9 +429,9 @@
 <section class="video-section" id="video">
   <div class="container">
     <div class="section-header">
-      <span class="overline reveal">Conheça o consultório</span>
-      <h2 class="reveal">Conheça o consultório</h2>
-      <p class="reveal">Um espaço pensado para o seu conforto e bem-estar. Assista e sinta-se em casa antes mesmo de chegar.</p>
+      <span class="overline reveal-left">Conheça o consultório</span>
+      <h2 class="reveal-left">Conheça o consultório</h2>
+      <p class="reveal-right">Um espaço pensado para o seu conforto e bem-estar. Assista e sinta-se em casa antes mesmo de chegar.</p>
     </div>
     <div class="video-wrapper reveal-scale" id="videoWrapper">
       <video id="mainVideo" preload="none" playsinline poster="PHOTO-2026-04-04-20-23-41.jpg" width="900" height="506">
@@ -420,8 +448,8 @@
 <section class="diferenciais" id="diferenciais">
   <div class="container">
     <div class="section-header">
-      <span class="overline reveal">Diferenciais</span>
-      <h2 class="reveal">Por que confiar na Dra. Leticia?</h2>
+      <span class="overline reveal-left">Diferenciais</span>
+      <h2 class="reveal-right">Por que confiar na Dra. Leticia?</h2>
     </div>
     <div class="dif-grid" id="difGrid">
       <div class="dif-card stagger-item">
@@ -467,7 +495,7 @@
         <p>Consultório em Ribeirão Preto projetado para oferecer conforto, privacidade e uma experiência que começa antes mesmo do procedimento.</p>
       </div>
     </div>
-    <div class="dif-cta reveal">
+    <div class="dif-cta reveal-right">
       <a href="https://wa.me/5516991420404?text=Olá%20Dra.%20Letícia!%20Gostaria%20de%20agendar%20uma%20avaliação.%20Vim%20pelo%20Instagram" class="sobre-cta">Quero agendar minha consulta →</a>
     </div>
   </div>
@@ -477,9 +505,9 @@
 <section class="faq" id="faq">
   <div class="container">
     <div class="section-header">
-      <span class="overline reveal">FAQ</span>
-      <h2 class="reveal">Dúvidas frequentes</h2>
-      <p class="reveal">As perguntas mais comuns das minhas pacientes — respondidas com transparência.</p>
+      <span class="overline reveal-right">FAQ</span>
+      <h2 class="reveal-left">Dúvidas frequentes</h2>
+      <p class="reveal-right">As perguntas mais comuns das minhas pacientes — respondidas com transparência.</p>
     </div>
     <div class="faq-container">
       <div class="faq-accordion" id="faqAccordion">
@@ -557,7 +585,7 @@
         </div>
       </div>
     </div>
-    <div class="faq-cta reveal">
+    <div class="faq-cta reveal-left">
       <a href="https://wa.me/5516991420404?text=Olá%20Dra.%20Letícia!%20Gostaria%20de%20agendar%20uma%20avaliação.%20Vim%20pelo%20Instagram" class="sobre-cta">Ainda tenho dúvidas — quero falar com a Dra. →</a>
     </div>
   </div>
@@ -567,9 +595,9 @@
 <section class="localizacao" id="localizacao">
   <div class="container">
     <div class="section-header" style="margin-bottom:48px">
-      <span class="overline overline-dark reveal">Localização</span>
-      <h2 class="reveal" style="color:var(--sf)">Fácil de chegar, difícil de esquecer.</h2>
-      <p class="reveal" style="color:var(--gray-light)">Ribeirão Preto, SP — Agende sua visita e conheça nosso espaço pessoalmente.</p>
+      <span class="overline overline-dark reveal-left">Localização</span>
+      <h2 class="reveal-left" style="color:var(--sf)">Fácil de chegar, difícil de esquecer.</h2>
+      <p class="reveal-right" style="color:var(--gray-light)">Ribeirão Preto, SP — Agende sua visita e conheça nosso espaço pessoalmente.</p>
     </div>
     <div class="loc-grid">
       <div class="loc-map reveal-left" id="mapSec">
@@ -624,16 +652,16 @@
   <div class="cta-final-bg"></div>
   <div class="container">
     <div class="cta-final-content">
-      <div class="divider-ornament reveal" style="margin-bottom:40px">
+      <div class="divider-ornament reveal-right" style="margin-bottom:40px">
         <div class="diamond"></div>
       </div>
-      <h2 class="reveal">Sua transformação começa com uma conversa.</h2>
-      <p class="reveal">Agende sua avaliação personalizada e descubra o melhor tratamento para você. Sem pressão, sem pressa — no seu tempo.</p>
+      <h2 class="reveal-left">Sua transformação começa com uma conversa.</h2>
+      <p class="reveal-right">Agende sua avaliação personalizada e descubra o melhor tratamento para você. Sem pressão, sem pressa — no seu tempo.</p>
       <a href="https://wa.me/5516991420404?text=Olá%20Dra.%20Letícia!%20Gostaria%20de%20agendar%20uma%20avaliação.%20Vim%20pelo%20Instagram" class="cta-final-btn reveal-scale magnetic">
         <svg width="24" height="24" fill="#fff"><use href="#icon-whatsapp"/></svg>
         Agende agora pelo WhatsApp
       </a>
-      <p class="cta-final-micro reveal">Atendimento via WhatsApp — resposta em até 2 horas. Agenda limitada.</p>
+      <p class="cta-final-micro reveal-left">Atendimento via WhatsApp — resposta em até 2 horas. Agenda limitada.</p>
     </div>
   </div>
 </section>

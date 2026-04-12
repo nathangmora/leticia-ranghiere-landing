@@ -1,3 +1,12 @@
+// ===== LOADING SCREEN =====
+window.addEventListener('load', () => {
+  const loader = document.getElementById('loadingScreen');
+  if (loader) {
+    setTimeout(() => loader.classList.add('hidden'), 400);
+    setTimeout(() => loader.remove(), 1000);
+  }
+});
+
 // ===== LENIS SMOOTH SCROLL =====
 let lenis;
 if (typeof Lenis !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -37,6 +46,18 @@ function updateNavbar() {
   } else {
     navbar.classList.remove('visible');
   }
+
+  // Dark mode for navbar over dark sections
+  const darkSections = document.querySelectorAll('.resultados, .localizacao, .cta-final');
+  let isOverDark = false;
+  const navBottom = 72; // navbar height
+  darkSections.forEach(section => {
+    const rect = section.getBoundingClientRect();
+    if (rect.top < navBottom && rect.bottom > 0) {
+      isOverDark = true;
+    }
+  });
+  navbar.classList.toggle('dark', isOverDark);
 }
 
 // ===== MOBILE MENU =====
@@ -56,14 +77,14 @@ function updateParallax() {
   const scrollY = window.scrollY;
   const vh = window.innerHeight;
 
-  // Hero depth parallax
+  // Hero depth parallax — subtle for split layout
   if (scrollY < vh * 1.2) {
     const heroPhoto = document.querySelector('.hero-photo');
     const heroContent = document.querySelector('.hero-content');
-    if (heroPhoto) heroPhoto.style.transform = 'translate3d(0,' + (scrollY * 0.3) + 'px,0)';
+    if (heroPhoto) heroPhoto.style.transform = 'translate3d(0,' + (scrollY * 0.15) + 'px,0)';
     if (heroContent) {
-      heroContent.style.transform = 'translate3d(0,' + (scrollY * -0.1) + 'px,0)';
-      heroContent.style.opacity = Math.max(0, 1 - scrollY / (vh * 0.8));
+      heroContent.style.transform = 'translate3d(0,' + (scrollY * -0.05) + 'px,0)';
+      heroContent.style.opacity = Math.max(0, 1 - scrollY / (vh * 0.9));
     }
   }
 
@@ -85,11 +106,23 @@ if (reducedMotion) {
   staggerParents.forEach(p => p.querySelectorAll('.stagger-item').forEach(i => i.classList.add('visible')));
 }
 
-function getRevealTransform(el, progress) {
-  if (el.classList.contains('reveal-left')) return `translateX(${-40 * (1 - progress)}px)`;
-  if (el.classList.contains('reveal-right')) return `translateX(${40 * (1 - progress)}px)`;
-  if (el.classList.contains('reveal-scale')) return `scale(${0.9 + 0.1 * progress})`;
-  return `translateY(${28 * (1 - progress)}px) scale(${0.96 + 0.04 * progress})`;
+function getRevealTransform(el, enterProgress, exitProgress) {
+  const SLIDE = window.innerWidth < 768 ? 30 : 120; // menor no mobile
+
+  if (exitProgress > 0) {
+    // Saindo — desloca para cima + escala reduz (funciona com overflow:hidden)
+    const ep = exitProgress;
+    if (el.classList.contains('reveal-left')) return `translateX(${-SLIDE * 0.3 * ep}px) translateY(${-30 * ep}px) scale(${1 - 0.08 * ep})`;
+    if (el.classList.contains('reveal-right')) return `translateX(${SLIDE * 0.3 * ep}px) translateY(${-30 * ep}px) scale(${1 - 0.08 * ep})`;
+    if (el.classList.contains('reveal-scale')) return `scale(${1 - 0.15 * ep})`;
+    return `translateY(${-40 * ep}px) scale(${1 - 0.05 * ep})`;
+  }
+
+  // Entrando — desliza do lado
+  if (el.classList.contains('reveal-left')) return `translateX(${-SLIDE * (1 - enterProgress)}px)`;
+  if (el.classList.contains('reveal-right')) return `translateX(${SLIDE * (1 - enterProgress)}px)`;
+  if (el.classList.contains('reveal-scale')) return `scale(${0.85 + 0.15 * enterProgress})`;
+  return `translateY(${40 * (1 - enterProgress)}px)`;
 }
 
 function updateScrollReveal() {
@@ -98,12 +131,23 @@ function updateScrollReveal() {
 
   revealElements.forEach(el => {
     const rect = el.getBoundingClientRect();
-    // Start at 95% of viewport, complete at 60%
-    const progress = Math.max(0, Math.min(1, (vh * 0.95 - rect.top) / (vh * 0.35)));
-    // Ease out cubic
-    const eased = 1 - Math.pow(1 - progress, 3);
-    el.style.opacity = eased;
-    el.style.transform = getRevealTransform(el, eased);
+
+    // Enter: começa quando o topo do elemento está a 110% da viewport (fora da tela)
+    // Completa quando está a 50% (centro da tela)
+    const enterProgress = Math.max(0, Math.min(1, (vh * 1.1 - rect.top) / (vh * 0.6)));
+
+    // Exit: começa quando o TOPO do elemento chega a 20% da viewport
+    // Completa quando topo sai da tela por cima
+    const exitProgress = Math.max(0, Math.min(1, (vh * 0.2 - rect.top) / (vh * 0.2)));
+
+    const enterEased = 1 - Math.pow(1 - enterProgress, 3);
+    const exitEased = exitProgress * exitProgress; // ease-in quadratic
+
+    // Opacidade: fade in na entrada, fade out na saída
+    const opacity = exitProgress > 0 ? Math.max(0, 1 - exitEased) : enterEased;
+
+    el.style.opacity = opacity;
+    el.style.transform = getRevealTransform(el, enterEased, exitEased);
   });
 
   staggerParents.forEach(parent => {
@@ -151,9 +195,9 @@ updateScrollReveal();
     const rect = counterSection.getBoundingClientRect();
     const vh = window.innerHeight;
 
-    // Progress: 0 when section enters bottom, 1 when section reaches middle
-    const start = vh * 0.9;
-    const end = vh * 0.3;
+    // Progress: 0 when section enters bottom, 1 when section is 60% up
+    const start = vh * 1.0;
+    const end = vh * 0.6;
     const progress = Math.max(0, Math.min(1, (start - rect.top) / (start - end)));
 
     // Ease out cubic
@@ -203,8 +247,9 @@ function toggleFaq(btn) {
 // ===== VIDEO PLAYER =====
 const videoPlay = document.getElementById('videoPlay');
 const mainVideo = document.getElementById('mainVideo');
-if (videoPlay) {
+if (videoPlay && mainVideo) {
   videoPlay.addEventListener('click', () => {
+    mainVideo.muted = false;
     mainVideo.play();
     videoPlay.style.display = 'none';
     mainVideo.controls = true;
@@ -213,6 +258,19 @@ if (videoPlay) {
     videoPlay.style.display = 'flex';
     mainVideo.controls = false;
   });
+
+  // Auto-play muted when visible
+  const videoObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        mainVideo.muted = true;
+        mainVideo.play().catch(() => {});
+      } else {
+        mainVideo.pause();
+      }
+    });
+  }, { threshold: 0.5 });
+  videoObserver.observe(mainVideo);
 }
 
 // ===== HERO PARTICLES =====
@@ -678,5 +736,32 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     autoTimer = setInterval(() => {
       positionCards((currentIndex + 1) % total);
     }, 6000);
+  });
+})();
+
+// ===== CUSTOM CURSOR =====
+(function() {
+  if (window.innerWidth < 768 || 'ontouchstart' in window) return;
+
+  const dot = document.createElement('div');
+  dot.classList.add('cursor-dot');
+  document.body.appendChild(dot);
+
+  let mouseX = 0, mouseY = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.left = mouseX - 4 + 'px';
+    dot.style.top = mouseY - 4 + 'px';
+    dot.classList.add('visible');
+  });
+
+  document.addEventListener('mouseleave', () => dot.classList.remove('visible'));
+
+  const interactives = 'a, button, .depo-card, .dif-card, .resultado-card, .tabnav-item, .service-panel-cta, .faq-question';
+  document.querySelectorAll(interactives).forEach(el => {
+    el.addEventListener('mouseenter', () => dot.classList.add('hover'));
+    el.addEventListener('mouseleave', () => dot.classList.remove('hover'));
   });
 })();
