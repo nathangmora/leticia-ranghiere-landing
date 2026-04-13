@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Dra. Leticia Ranghiere</title>
+<meta name="description" content="Harmonização facial e estética dental em Ribeirão Preto com Dra. Leticia Ranghiere. Resultados naturais, atendimento humanizado.">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#EDEBE8;color:#1a1a1a}
+:root{--bg:#EDEBE8;--sf:#F4F2EF;--nude:#C8A88E;--graf:#2C2C2A;--gray:#8a8880;--glt:#b5b3ad;--r:24px;
+--so:6px 6px 16px rgba(190,186,180,.45),-6px -6px 16px rgba(255,255,255,.8);
+--ss:3px 3px 8px rgba(190,186,180,.35),-3px -3px 8px rgba(255,255,255,.7);
+--si:inset 3px 3px 8px rgba(190,186,180,.35),inset -3px -3px 8px rgba(255,255,255,.7);
+--eb:cubic-bezier(0.34,1.56,0.64,1)}
+body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+.sb{position:fixed;top:0;left:0;height:2px;z-index:9998;background:var(--nude);opacity:.7;border-radius:0 2px 2px 0}
+[data-s]{opacity:0;transform:translateY(28px) scale(.96);transition:opacity .6s var(--eb),transform .6s var(--eb)}
+[data-s].v{opacity:1;transform:translateY(0) scale(1)}
+[data-s="1"]{transition-delay:50ms}[data-s="2"]{transition-delay:100ms}[data-s="3"]{transition-delay:150ms}
+[data-s="4"]{transition-delay:200ms}[data-s="5"]{transition-delay:250ms}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes shimmer{0%{left:-100%}40%,100%{left:100%}}
+@keyframes pulse{0%{transform:translate(-50%,-50%) scale(1);opacity:.6}100%{transform:translate(-50%,-50%) scale(3.5);opacity:0}}
+@keyframes pinRise{0%{opacity:0;transform:translate(-50%,-100%) scale(.5)}50%{opacity:1;transform:translate(-50%,-100%) scale(1.12)}72%{transform:translate(-50%,-100%) scale(.94)}100%{opacity:1;transform:translate(-50%,-100%) scale(1)}}
+@keyframes ctaPop{0%{opacity:0;transform:translate(-50%,8px) scale(.85)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes shadowBreathe{0%,100%{transform:translate(-50%,0) scaleX(1);opacity:.3}50%{transform:translate(-50%,0) scaleX(.65);opacity:.12}}
+.w{max-width:420px;margin:0 auto;padding:0 20px 48px}
+.hero{padding:56px 0 0;text-align:center}
+.avw{display:inline-block;margin-bottom:28px;animation:float 5s ease-in-out infinite;position:relative}
+.av{width:154px;height:154px;border-radius:50%;overflow:hidden;box-shadow:var(--so),0 0 0 5px var(--bg);background:linear-gradient(145deg,#e8e0d8,#d9cfc4)}
+.av img{width:100%;height:100%;object-fit:cover;object-position:center 20%}
+.avr{position:absolute;inset:-10px;border-radius:50%;border:1.5px solid rgba(200,168,142,.25)}
+.hero h1{font-family:'Instrument Serif',Georgia,serif;font-size:clamp(32px,9vw,42px);font-weight:400;color:var(--graf);letter-spacing:-1px;line-height:1.08}
+.hero .su{font-size:clamp(13px,3.8vw,15px);color:var(--gray);margin:12px 0 6px;font-weight:300}
+.hero .su2{font-size:clamp(12px,3.4vw,14px);color:var(--glt);font-weight:300;margin-bottom:20px}
+.pl{display:inline-flex;align-items:center;gap:6px;background:var(--bg);box-shadow:var(--si);border-radius:50px;padding:8px 16px}
+.pld{width:7px;height:7px;border-radius:50%;background:var(--nude);box-shadow:0 0 8px rgba(200,168,142,.6);flex-shrink:0}
+.pl span{font-size:clamp(9px,2.8vw,11px);color:var(--nude);font-weight:500;letter-spacing:.4px;white-space:nowrap}
+.sts{display:flex;margin:32px 0 0;padding:26px 20px;background:var(--sf);box-shadow:var(--so);border-radius:var(--r)}
+.st{flex:1;text-align:center}.st:not(:last-child){border-right:1px solid rgba(200,168,142,.1)}
+.st b{font-family:'Instrument Serif',Georgia,serif;font-size:clamp(22px,7vw,28px);color:var(--graf);font-weight:400;display:block}
+.st small{font-size:clamp(9px,2.5vw,10px);color:var(--glt);text-transform:uppercase;letter-spacing:1.2px;margin-top:4px;display:block}
+.wa{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#2BD96B,#25D366);border-radius:var(--r);padding:20px 22px;text-decoration:none;color:#fff;margin:24px 0 0;position:relative;overflow:hidden;box-shadow:4px 4px 14px rgba(37,211,102,.35),-2px -2px 8px rgba(255,255,255,.15);transition:transform .3s var(--eb)}
+.wa:active{transform:scale(.96)}
+.wa::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);animation:shimmer 5s ease-in-out infinite}
+.wai{width:48px;height:48px;border-radius:16px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wa h3{font-size:16px;font-weight:600}.wa p{font-size:12px;opacity:.75;margin-top:2px;font-weight:300}
+.sp{height:48px}
+.sec{font-size:11px;font-weight:600;color:var(--glt);letter-spacing:2.5px;text-transform:uppercase;margin:0 0 18px}
+.bn{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.bc{border-radius:var(--r);padding:22px 18px;text-decoration:none;color:var(--graf);display:flex;flex-direction:column;justify-content:space-between;min-height:155px;background:var(--sf);box-shadow:var(--so);position:relative;overflow:hidden;transition:transform .3s var(--eb),box-shadow .3s ease}
+.bc:active{transform:scale(.96);box-shadow:var(--si)}
+.bc.bw{grid-column:1/-1;flex-direction:row;align-items:center;gap:16px;min-height:auto;padding:20px 22px}
+.bi{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:var(--bg);box-shadow:var(--si)}
+.bt{font-size:15px;font-weight:600;letter-spacing:-.3px;line-height:1.25;margin-top:auto}
+.bd{font-size:12px;color:var(--gray);margin-top:6px;line-height:1.5;font-weight:300}
+.ba{position:absolute;right:14px;bottom:14px;font-size:13px;color:var(--glt);width:26px;height:26px;border-radius:50%;background:var(--bg);box-shadow:var(--ss);display:flex;align-items:center;justify-content:center}
+.bc.bw .ba{position:static;margin-left:auto}
+.tc{background:var(--sf);box-shadow:var(--so);border-radius:var(--r);padding:24px;margin-bottom:16px;transition:transform .3s var(--eb)}
+.tc:active{transform:scale(.98);box-shadow:var(--si)}
+.sr{display:flex;gap:3px;margin-bottom:14px}.ss{width:16px;height:16px;fill:var(--nude)}
+.tc q{font-size:15px;color:var(--graf);line-height:1.75;font-style:italic;font-weight:300;display:block}
+.tc cite{font-size:12px;color:var(--glt);margin-top:14px;font-style:normal;display:block;font-weight:500}
+.tc .depo-service{font-size:11px;color:var(--nude);margin-top:4px;font-weight:500;letter-spacing:.3px}
+.lc{display:flex;align-items:center;gap:14px;border-radius:var(--r);padding:18px 20px;margin-bottom:14px;text-decoration:none;background:var(--sf);box-shadow:var(--so);transition:transform .3s var(--eb)}
+.lc:active{transform:scale(.97);box-shadow:var(--si)}
+.lc.dk{background:var(--graf);box-shadow:4px 4px 14px rgba(30,28,25,.4),-3px -3px 10px rgba(80,78,74,.15)}
+.li{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg);box-shadow:var(--si)}
+.lc.dk .li{background:rgba(200,168,142,.1);box-shadow:none}
+.lt{font-size:14px;font-weight:500}.ld{font-size:12px;color:var(--gray);margin-top:2px;font-weight:300}
+.la{font-size:15px;color:var(--glt);flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--bg);box-shadow:var(--ss);display:flex;align-items:center;justify-content:center}
+.lc.dk .la{background:rgba(200,168,142,.08);box-shadow:none}
+.hrs{background:var(--sf);box-shadow:var(--so);border-radius:var(--r);padding:20px 22px;margin-bottom:14px}
+.hrs-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+.hrs-row:not(:last-child){border-bottom:1px solid rgba(200,168,142,.08)}
+.hrs-day{font-size:13px;color:var(--graf);font-weight:500}
+.hrs-time{font-size:13px;color:var(--gray);font-weight:300}
+.cr{text-align:center;padding:32px 20px 8px}.cr p{font-size:11px;color:var(--glt);line-height:2.2;font-weight:300}
+.ft{text-align:center;padding:16px 0 32px;border-top:1px solid rgba(200,168,142,.08)}
+.ftl{font-family:'Instrument Serif',Georgia,serif;font-size:30px;color:var(--nude);font-style:italic;display:inline-block;animation:float 6s ease-in-out infinite}
+.ft p{font-size:10px;color:var(--glt);margin-top:6px;font-weight:300}
+::-webkit-scrollbar{width:0;background:transparent}
+/* ===== LEAFLET MAP ===== */
+.map-section-lf{width:100%;padding:40px 0 24px}
+.map-label-lf{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#C8A88E;opacity:.5;margin-bottom:16px;padding:0 20px}
+.map-wrapper-lf{position:relative;width:100%;border-radius:24px;overflow:hidden;margin:0}
+#leafletMap{width:100%;height:280px;z-index:1}
+.leaflet-control-attribution{display:none!important}
+.leaflet-control-zoom{display:none!important}
+.map-vignette-lf{position:absolute;inset:0;border-radius:24px;background:radial-gradient(ellipse 80% 70% at 55% 45%,transparent 40%,rgba(10,10,9,.75) 100%);pointer-events:none;z-index:2}
+.pin-cta{background:rgba(15,15,13,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(200,168,142,.15);border-radius:16px;padding:14px 18px;text-align:center;min-width:220px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.pin-cta .cta-title{font-size:14px;font-weight:600;color:#F5F0EB;margin-bottom:2px}
+.pin-cta .cta-sub{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:12px}
+.pin-cta .cta-btn{display:inline-block;background:#C8A88E;color:#fff;font-size:13px;font-weight:600;padding:10px 22px;border-radius:50px;text-decoration:none;transition:transform .15s,background .2s}
+.pin-cta .cta-btn:active{transform:scale(.96)}
+.custom-pin{position:relative;width:36px;height:46px}
+.custom-pin .pin-body{width:36px;height:36px;background:#C8A88E;border-radius:50% 50% 50% 0;transform:rotate(-45deg);position:absolute;top:0;left:0;box-shadow:0 4px 16px rgba(200,168,142,.5)}
+.custom-pin .pin-inner{width:14px;height:14px;background:#F5F0EB;border-radius:50%;position:absolute;top:11px;left:11px;z-index:1}
+.custom-pin .pin-shadow{width:20px;height:6px;background:rgba(0,0,0,.3);border-radius:50%;filter:blur(3px);position:absolute;bottom:0;left:8px}
+.start-point{width:14px;height:14px;position:relative}
+.start-point .dot{width:10px;height:10px;background:#888880;border-radius:50%;border:2px solid #555;position:absolute;top:2px;left:2px}
+.start-point::before{content:'';position:absolute;inset:-2px;border-radius:50%;border:1.5px solid #888880;animation:startPulse 2s ease-in-out infinite}
+@keyframes startPulse{0%,100%{transform:scale(1);opacity:.3}50%{transform:scale(1.6);opacity:0}}
+.custom-pin::before{content:'';position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;border:2px solid #C8A88E;animation:glowPulse 2.5s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{transform:scale(1);opacity:.4}50%{transform:scale(1.8);opacity:0}}
+#mapSec .leaflet-marker-icon{opacity:0;transition:opacity .3s ease}
+#mapSec .leaflet-marker-icon.show{opacity:1}
+@keyframes pinDrop{0%{transform:translateY(-40px);opacity:0}60%{transform:translateY(4px);opacity:1}80%{transform:translateY(-2px)}100%{transform:translateY(0);opacity:1}}
+.pin-animated{animation:pinDrop .7s cubic-bezier(.34,1.56,.64,1) forwards}
+.leaflet-popup-content-wrapper{background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:0!important}
+.leaflet-popup-content{margin:0!important;line-height:normal!important}
+.leaflet-popup-tip-container{display:none!important}
+.leaflet-popup-close-button{display:none!important}
+.map-address-lf{margin-top:16px;display:flex;align-items:center;gap:12px;padding:16px 18px;background:#2C2C2A;border-radius:16px;cursor:pointer;transition:background .2s;text-decoration:none;margin:16px 20px 0}
+.map-address-lf:hover{background:#353533}
+.map-address-icon-lf{width:42px;height:42px;border-radius:12px;background:rgba(200,168,142,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.map-address-icon-lf svg{width:20px;height:20px}
+.map-address-text-lf{flex:1;min-width:0}
+.map-address-title-lf{font-size:14px;font-weight:600;color:#F5F0EB;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-address-sub-lf{font-size:12px;color:#C8A88E;opacity:.6;margin-top:2px}
+.map-address-arrow-lf{font-size:16px;color:#C8A88E;opacity:.5;flex-shrink:0}
+/* Depoimentos - stacked with show more */
+.depo-stack .tc:nth-child(n+4){display:none}
+.depo-stack.expanded .tc:nth-child(n+4){display:block}
+.depo-more{display:flex;align-items:center;justify-content:center;gap:8px;background:none;border:1.5px solid rgba(200,168,142,.3);border-radius:var(--r);padding:14px;margin-top:4px;width:100%;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:500;color:var(--nude);transition:all .3s var(--eb)}
+.depo-more:active{transform:scale(.97);background:rgba(200,168,142,.06)}
+.depo-stack.expanded .depo-more{display:none}
+
+/* ===== 320px — small mobile ===== */
+@media(max-width:340px){
+.w{padding:0 14px 40px}
+.hero{padding:44px 0 0}
+.av{width:110px;height:110px}
+.avr{inset:-8px}
+.wa{padding:16px 18px;gap:12px}
+.wai{width:40px;height:40px;border-radius:12px}
+.wa h3{font-size:14px}
+.sp{height:36px}
+.bc{padding:16px 14px;min-height:130px}
+.bc.bw{padding:16px 16px}
+.bi{width:38px;height:38px;border-radius:10px;font-size:18px}
+.sts{padding:20px 14px;margin:24px -14px 0}
+.tc{padding:20px}
+.tc q{font-size:14px}
+.lc{padding:16px 16px;gap:12px}
+.li{width:40px;height:40px;border-radius:12px}
+.hrs{padding:18px 16px}
+.hrs-day,.hrs-time{font-size:12px}
+.map-address-lf{padding:14px 14px;gap:10px}
+.map-address-icon-lf{width:36px;height:36px;border-radius:10px}
+.map-address-title-lf{font-size:13px}
+.map-address-sub-lf{font-size:11px}
+}
+
+/* ===== 768px+ — tablet ===== */
+@media(min-width:600px){
+.w{max-width:560px;padding:0 32px 60px}
+.hero{padding:72px 0 0}
+.av{width:160px;height:160px}
+.avr{inset:-12px}
+.hero h1{font-size:48px}
+.hero .su{font-size:16px}
+.hero .su2{font-size:15px}
+.pl span{font-size:12px}
+.sts{margin:36px 0 0;padding:30px 32px}
+.st b{font-size:32px}
+.st small{font-size:10px}
+.wa{padding:24px 28px}
+.wa h3{font-size:18px}
+.sp{height:56px}
+.bn{gap:18px}
+.bc{padding:26px 22px;min-height:175px}
+.bc.bw{padding:24px 26px}
+.bi{width:52px;height:52px;border-radius:16px;font-size:24px}
+.bt{font-size:18px}
+.bd{font-size:14px}
+.tc{padding:28px}
+.tc q{font-size:16px}
+.tc cite{font-size:13px}
+.lc{padding:22px 26px}
+.li{width:52px;height:52px}
+.lt{font-size:16px}
+.ld{font-size:13px}
+.hrs{padding:26px 28px}
+.hrs-day,.hrs-time{font-size:15px}
+#leafletMap{height:380px}
+.map-address-lf{margin:16px 32px 0;padding:20px 24px}
+.cr p{font-size:12px}
+.depo-stack .tc:nth-child(n+4){display:block}
+.depo-more{display:none}
+}
+</style>
+</head>
+<body>
+<div class="sb" id="sb"></div>
+<div class="w">
+<div class="hero">
+<div class="avw" data-s="0"><div class="avr"></div><div class="av"><img src="PHOTO-2026-04-04-20-29-24.webp" alt="Dra. Leticia Ranghiere"></div></div>
+<h1 data-s="1">Dra. Leticia<br>Ranghiere</h1>
+<p class="su" data-s="2">Cirurgi&atilde;-Dentista &middot; UNESP</p>
+<p class="su2" data-s="2">Est&eacute;tica Dental + Harmoniza&ccedil;&atilde;o Facial</p>
+<div data-s="3"><div class="pl"><div class="pld"></div><span>CRO/SP 133.036 &middot; Ribeir&atilde;o Preto</span></div></div>
+<div class="sts" data-s="4">
+<div class="st"><b>+1k</b><small>Pacientes</small></div>
+<div class="st"><b>UNESP</b><small>Forma&ccedil;&atilde;o</small></div>
+<div class="st"><b>7+</b><small>Anos exp.</small></div>
+</div>
+<a href="https://wa.me/5516991420404?text=Ol%C3%A1%20Dra.%20Let%C3%ADcia!%20Gostaria%20de%20agendar%20uma%20avalia%C3%A7%C3%A3o.%20Vim%20pelo%20Instagram" class="wa" data-s="5" target="_blank">
+<div class="wai"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.625-1.476A11.93 11.93 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.09 0-4.14-.564-5.93-1.632l-.425-.253-2.742.876.87-2.675-.277-.44A9.72 9.72 0 012.25 12 9.75 9.75 0 0112 2.25 9.75 9.75 0 0121.75 12 9.75 9.75 0 0112 21.75z"/></svg></div>
+<div style="flex:1"><h3>Agende sua avalia&ccedil;&atilde;o</h3><p>Atendimento personalizado via WhatsApp</p></div>
+<span style="font-size:20px;opacity:.5">&rarr;</span></a>
+</div>
+<div class="sp"></div>
+
+<!-- PROCEDIMENTOS -->
+<p class="sec" data-s="0">Tratamentos</p>
+<div class="bn">
+<a href="https://wa.me/5516991420404?text=Ol%C3%A1%20Dra.%20Let%C3%ADcia!%20Tenho%20interesse%20em%20harmoniza%C3%A7%C3%A3o%20facial" class="bc" data-s="1" target="_blank"><div class="bi">&#x2728;</div><div><div class="bt">Harmoniza&ccedil;&atilde;o Facial</div><div class="bd">Equil&iacute;brio e harmonia natural dos tra&ccedil;os</div></div><span class="ba">&nearr;</span></a>
+<a href="https://wa.me/5516991420404?text=Ol%C3%A1%20Dra.%20Let%C3%ADcia!%20Tenho%20interesse%20em%20est%C3%A9tica%20dental" class="bc" data-s="2" target="_blank"><div class="bi">&#x1F601;</div><div><div class="bt">Est&eacute;tica Dental</div><div class="bd">Clareamento, restaura&ccedil;&otilde;es e design do sorriso</div></div><span class="ba">&nearr;</span></a>
+<a href="https://wa.me/5516991420404?text=Ol%C3%A1%20Dra.%20Let%C3%ADcia!%20Tenho%20interesse%20em%20botox" class="bc" data-s="3" target="_blank"><div class="bi">&#x2728;</div><div><div class="bt">Botox</div><div class="bd">Suaviza linhas mantendo naturalidade</div></div><span class="ba">&nearr;</span></a>
+<a href="https://wa.me/5516991420404?text=Ol%C3%A1%20Dra.%20Let%C3%ADcia!%20Tenho%20interesse%20em%20preenchimento%20labial" class="bc" data-s="4" target="_blank"><div class="bi">&#x1F48B;</div><div><div class="bt">Preenchimento Labial</div><div class="bd">Volume sutil e contorno delicado</div></div><span class="ba">&nearr;</span></a>
+<a href="https://wa.me/5516991420404?text=Ol%C3%A1%20Dra.%20Let%C3%ADcia!%20Tenho%20interesse%20em%20microagulhamento" class="bc bw" data-s="5" target="_blank"><div class="bi">&#x1F52C;</div><div style="flex:1"><div class="bt">Microagulhamento &amp; Peeling</div><div class="bd">Renova&ccedil;&atilde;o profunda e luminosidade da pele</div></div><span class="ba">&rarr;</span></a>
+<a href="https://wa.me/5516991420404?text=Ol%C3%A1%20Dra.%20Let%C3%ADcia!%20Tenho%20interesse%20em%20limpeza%20dent%C3%A1ria" class="bc bw" data-s="5" target="_blank"><div class="bi">&#x1F9F7;</div><div style="flex:1"><div class="bt">Limpeza Dent&aacute;ria</div><div class="bd">Base de um sorriso saud&aacute;vel &mdash; indicada a cada 6 meses</div></div><span class="ba">&rarr;</span></a>
+</div>
+<div class="sp"></div>
+
+<!-- DEPOIMENTOS -->
+<p class="sec" data-s="0">Depoimentos</p>
+<div class="depo-stack" id="depoStack">
+<div class="tc" data-s="1"><div class="sr"><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg></div><q>Eu tinha vergonha de sorrir em fotos. Depois do tratamento, n&atilde;o consigo parar. A Dra. Leticia entendeu exatamente o que eu queria, e o resultado ficou t&atilde;o natural que as pessoas acham que meus dentes sempre foram assim.</q><cite>&mdash; Camila R., 32 anos</cite><div class="depo-service">Est&eacute;tica Dental</div></div>
+<div class="tc" data-s="2"><div class="sr"><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg></div><q>Fui fazer botox pela primeira vez e estava com muito medo de ficar com cara de &ldquo;congelada&rdquo;. A Dra. me explicou tudo com calma e o resultado ficou lindo. Meu marido disse que eu pare&ccedil;o mais descansada.</q><cite>&mdash; Patr&iacute;cia M., 45 anos</cite><div class="depo-service">Botox</div></div>
+<div class="tc" data-s="3"><div class="sr"><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg></div><q>A harmoniza&ccedil;&atilde;o mudou minha autoestima de um jeito que eu n&atilde;o esperava. N&atilde;o &eacute; que eu virei outra pessoa &mdash; eu me reconheci. Foi como se o reflexo no espelho combinasse com como eu me sinto por dentro.</q><cite>&mdash; Fernanda L., 38 anos</cite><div class="depo-service">Harmoniza&ccedil;&atilde;o Facial</div></div>
+<div class="tc" data-s="4"><div class="sr"><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg></div><q>Pesquisei muito antes de escolher uma profissional e a Dra. Leticia me passou uma seguran&ccedil;a enorme. Fiz preenchimento labial e microagulhamento, tudo muito bem explicado. J&aacute; indiquei para tr&ecirc;s amigas.</q><cite>&mdash; Juliana T., 29 anos</cite><div class="depo-service">Preenchimento + Microagulhamento</div></div>
+<div class="tc" data-s="5"><div class="sr"><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg><svg class="ss" viewBox="0 0 20 20"><path d="M10 1l2.39 5.64L18 7.24l-4 4.26L15.18 18 10 14.77 4.82 18 6 11.5 2 7.24l5.61-.6z"/></svg></div><q>Eu queria algo sutil &mdash; n&atilde;o queria que ningu&eacute;m percebesse que eu &ldquo;fiz alguma coisa&rdquo;. A Dra. Leticia respeitou isso e o resultado &eacute; exatamente o que eu pedi: bonito, discreto e natural.</q><cite>&mdash; Renata S., 51 anos</cite><div class="depo-service">Harmoniza&ccedil;&atilde;o Facial</div></div>
+<button class="depo-more" onclick="document.getElementById('depoStack').classList.add('expanded')">Ver mais depoimentos &darr;</button>
+</div>
+
+<!-- ========== MAP ========== -->
+<div style="margin:60px -20px 0;position:relative;overflow:hidden;background:#0a0a09" id="mapSec">
+<div class="map-section-lf">
+<div class="map-label-lf">Localiza&ccedil;&atilde;o</div>
+<div class="map-wrapper-lf">
+<div id="leafletMap"></div>
+<div class="map-vignette-lf"></div>
+</div>
+<a class="map-address-lf"
+   href="https://maps.google.com/maps?q=R.+Galileu+Galilei,+1685+-+Jardim+Iraj%C3%A1,+Ribeir%C3%A3o+Preto+-+SP"
+   target="_blank" rel="noopener noreferrer">
+<div class="map-address-icon-lf">
+<svg viewBox="0 0 24 24" fill="none" stroke="#C8A88E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+<circle cx="12" cy="10" r="3"/>
+</svg>
+</div>
+<div class="map-address-text-lf">
+<div class="map-address-title-lf">Ribeir&atilde;o Preto, SP</div>
+<div class="map-address-sub-lf">R. Galileu Galilei, 1685 &mdash; Jd. Iraj&aacute;</div>
+</div>
+<span class="map-address-arrow-lf">&rarr;</span>
+</a>
+</div>
+</div>
+
+<div class="sp"></div>
+
+<!-- HORARIOS -->
+<p class="sec" data-s="0">Hor&aacute;rios</p>
+<div class="hrs" data-s="1">
+<div class="hrs-row"><span class="hrs-day">Segunda a Sexta</span><span class="hrs-time">8h &mdash; 18h</span></div>
+<div class="hrs-row"><span class="hrs-day">S&aacute;bado</span><span class="hrs-time">8h &mdash; 12h</span></div>
+<div class="hrs-row"><span class="hrs-day">Domingo</span><span class="hrs-time">Fechado</span></div>
+</div>
+
+<div class="sp"></div>
+
+<!-- LINKS -->
+<p class="sec" data-s="0">Saiba mais</p>
+<a href="https://draleticiaranghiere.com.br" class="lc dk" data-s="1" target="_blank">
+<div class="li" style="background:rgba(200,168,142,.1);box-shadow:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A88E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+<div style="flex:1"><div class="lt" style="color:#F5F0EB">Conhe&ccedil;a meu site</div><div class="ld" style="color:#888">Procedimentos e informa&ccedil;&otilde;es</div></div>
+<span class="la" style="color:#666;background:rgba(200,168,142,.08);box-shadow:none">&rarr;</span></a>
+<a href="https://instagram.com/draleticiarns" class="lc" data-s="2" target="_blank">
+<div class="li"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2C2C2A" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="#2C2C2A" stroke="none"/></svg></div>
+<div style="flex:1"><div class="lt">Siga no Instagram</div><div class="ld">Conte&uacute;do sobre est&eacute;tica</div></div>
+<span class="la">&rarr;</span></a>
+
+<div class="cr" data-s="0"><p>Cirurgi&atilde;-Dentista &middot; UNESP</p><p>Esp. Dent&iacute;stica Est&eacute;tica e Restauradora</p><p>Harmoniza&ccedil;&atilde;o Orofacial &middot; CRO/SP 133.036</p></div>
+<div class="ft" data-s="0"><div class="ftl">LR</div><p>Dra. Leticia Ranghiere &middot; Odontologia</p><p style="margin-top:2px">&copy; 2026</p></div>
+</div>
+<script>
+var O=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting)x.target.classList.add('v')})},{threshold:.08,rootMargin:'0px 0px -20px 0px'});
+document.querySelectorAll('[data-s]').forEach(function(el){O.observe(el)});
+
+/* ===== LEAFLET MAP ===== */
+(function(){
+var lat=-21.2117037,lng=-47.8114454;
+var map=L.map('leafletMap',{center:[lat,lng],zoom:16,zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,boxZoom:false,keyboard:false});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
+
+/* Route coordinates around the clinic area */
+var routeCoords=[[-21.2100,-47.8135],[-21.2103,-47.8130],[-21.2106,-47.8126],[-21.2108,-47.8122],[-21.2110,-47.8119],[-21.2112,-47.8117],[-21.2114,-47.8115],[-21.2116,-47.8114],[-21.2117,-47.8114]];
+
+var routeGlow=L.polyline([],{color:'#C8A88E',weight:8,opacity:.15,lineCap:'round',lineJoin:'round'}).addTo(map);
+var routeLine=L.polyline([],{color:'#C8A88E',weight:3,opacity:.9,lineCap:'round',lineJoin:'round'}).addTo(map);
+
+var startIcon=L.divIcon({className:'',html:'<div class="start-point"><div class="dot"></div></div>',iconSize:[14,14],iconAnchor:[7,7]});
+var startMarker=L.marker(routeCoords[0],{icon:startIcon,interactive:false}).addTo(map);
+
+var pinIcon=L.divIcon({className:'',html:'<div class="custom-pin pin-animated"><div class="pin-body"></div><div class="pin-inner"></div><div class="pin-shadow"></div></div>',iconSize:[36,46],iconAnchor:[18,46],popupAnchor:[0,-50]});
+var marker=L.marker([lat,lng],{icon:pinIcon}).addTo(map);
+
+var popupContent='<div class="pin-cta"><div class="cta-title">R. Galileu Galilei, 1685</div><div class="cta-sub">Jardim Iraj\u00e1 \u00b7 Ribeir\u00e3o Preto, SP</div><a class="cta-btn" href="https://wa.me/5516991420404?text=Ol%C3%A1!%20Vi%20a%20localiza%C3%A7%C3%A3o.%20Gostaria%20de%20agendar" target="_blank" rel="noopener">Agendar avalia\u00e7\u00e3o \u2192</a></div>';
+var popup=L.popup({closeButton:false,closeOnClick:false,autoClose:false,className:'custom-popup',offset:[0,-4]}).setContent(popupContent);
+marker.bindPopup(popup);
+setTimeout(function(){map.invalidateSize()},100);
+
+var hasFlown=false;
+function startFlyIn(){
+if(hasFlown)return;hasFlown=true;
+function lerp(c,n){var r=[];for(var i=0;i<c.length-1;i++){var a=c[i],b=c[i+1];for(var j=0;j<n;j++){var t=j/n;r.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t])}}r.push(c[c.length-1]);return r}
+var smooth=lerp(routeCoords,8),total=smooth.length,duration=2500,drawn=[],idx=0,t0=performance.now();
+var startEl=startMarker.getElement();if(startEl)startEl.classList.add('show');
+function draw(now){var p=Math.min((now-t0)/duration,1);var e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;var target=Math.floor(e*total);
+if(target>idx){for(var i=idx;i<=target&&i<total;i++)drawn.push(smooth[i]);idx=target;routeLine.setLatLngs(drawn);routeGlow.setLatLngs(drawn)}
+if(p<1){requestAnimationFrame(draw)}else{routeLine.setLatLngs(smooth);routeGlow.setLatLngs(smooth);
+setTimeout(function(){var el=marker.getElement();if(el){el.classList.add('show');var pinDiv=el.querySelector('.custom-pin');if(pinDiv){pinDiv.classList.remove('pin-animated');void pinDiv.offsetWidth;pinDiv.classList.add('pin-animated')}}},400);
+setTimeout(function(){marker.openPopup()},1200)}}
+requestAnimationFrame(draw)}
+var mapObs=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){setTimeout(startFlyIn,300);mapObs.disconnect()}})},{threshold:.3});
+mapObs.observe(document.querySelector('.map-wrapper-lf'));
+})();
+
+window.addEventListener('scroll',function(){var h=document.documentElement.scrollHeight-innerHeight;document.getElementById('sb').style.width=(scrollY/h*100)+'%'},{passive:true});
+</script>
+</body>
+</html>
